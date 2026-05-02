@@ -388,7 +388,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
 
 <script>
 // ═══ CONFIG ═══
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwXZCNDK_uxtiM4SNcSheAKC8qY1WuGu4qBFp6yqPUvMISqQznnI0DL3C4fkpt7X2y8gw/exec';
+const SHEET_URL = 'SHEET_WEB_APP_URL';
 const DEF_CATS = [
   {id:'c1',name:'Salary',type:'income',icon:'💼'},{id:'c2',name:'Freelance',type:'income',icon:'💻'},
   {id:'c3',name:'Investment Returns',type:'income',icon:'📈'},{id:'c4',name:'Other Income',type:'income',icon:'💰'},
@@ -446,8 +446,8 @@ let swipeX0=0, swipeActive=false;
 async function hashPwd(p){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
 
 // ═══ STORAGE ═══
-async function syncSheet(d){if(SHEET_URL==='SHEET_WEB_APP_URL')return false;try{const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'save',data:JSON.stringify(d)})});return(await r.json()).success}catch{return false}}
-async function fetchSheet(){if(SHEET_URL==='SHEET_WEB_APP_URL')return null;try{const r=await fetch(SHEET_URL+'?action=load');const j=await r.json();return j.data?JSON.parse(j.data):null}catch{return null}}
+async function syncSheet(d){if(SHEET_URL==='SHEET_WEB_APP_URL')return false;try{const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'save',data:JSON.stringify(d)}),redirect:'follow'});return(await r.json()).success}catch{return false}}
+async function fetchSheet(){if(SHEET_URL==='SHEET_WEB_APP_URL')return null;try{const r=await fetch(SHEET_URL+'?action=load',{redirect:'follow'});const j=await r.json();return j.data?JSON.parse(j.data):null}catch{return null}}
 async function save(){localStorage.setItem('budgr',JSON.stringify(S));if(SHEET_URL!=='SHEET_WEB_APP_URL'){const ok=await syncSheet(S);if(ok){S.lastSync=new Date().toISOString();localStorage.setItem('budgr',JSON.stringify(S));const e=document.getElementById('lsl');if(e)e.textContent=fmtSync(S.lastSync)}}}
 function loadLocal(){try{const r=localStorage.getItem('budgr');return r?JSON.parse(r):null}catch{return null}}
 
