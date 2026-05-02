@@ -1053,7 +1053,14 @@ function renderComparePeriodDetail(p){
 
 // ═══ SYNC / RESET ═══
 async function syncNow(){if(SHEET_URL==='SHEET_WEB_APP_URL'){toast('⚠️ Sheet URL not configured');return}toast('Syncing...');const ok=await syncSheet(S);if(ok){S.lastSync=new Date().toISOString();localStorage.setItem('budgr',JSON.stringify(S));document.getElementById('lsl').textContent=fmtSync(S.lastSync);toast('✅ Synced!')}else toast('❌ Sync failed')}
-function askReset(){askConfirm('Reset all data?','Permanently deletes ALL data. Cannot be undone.',()=>{localStorage.removeItem('budgr');location.reload()})}
+function askReset(){askConfirm('Reset all data?','Permanently deletes ALL data including cloud sync. Cannot be undone.',async()=>{
+  localStorage.removeItem('budgr');
+  // also clear Sheet data
+  if(SHEET_URL!=='SHEET_WEB_APP_URL'){
+    try{await fetch(SHEET_URL+'?action=save&data='+encodeURIComponent(JSON.stringify({})),{redirect:'follow'});}catch{}
+  }
+  location.reload();
+})}
 
 // ═══ CONFETTI ═══
 function confetti(){const c=document.getElementById('cc');c.style.display='block';const x=c.getContext('2d');c.width=window.innerWidth;c.height=window.innerHeight;const ps=Array.from({length:80},()=>({x:Math.random()*c.width,y:Math.random()*-c.height,r:Math.random()*6+2,d:Math.random()*80+10,col:['#7c6af7','#f7c86a','#6af7b8','#f76a6a','#fff'][Math.floor(Math.random()*5)],t:Math.random()*10-10,ti:Math.random()*.07+.05}));let a=0,f=0;function draw(){x.clearRect(0,0,c.width,c.height);a+=.01;ps.forEach(p=>{x.beginPath();x.fillStyle=p.col;x.ellipse(p.x,p.y,p.r,p.r*.4,p.t,0,Math.PI*2);x.fill();p.y+=Math.cos(a+p.d)+2;p.x+=Math.sin(a)*1.5;p.t+=p.ti;});f++;if(f<120)requestAnimationFrame(draw);else{x.clearRect(0,0,c.width,c.height);c.style.display='none';}}draw()}
