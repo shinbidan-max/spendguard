@@ -457,7 +457,7 @@ async function init(){
   let d=null;
   if(SHEET_URL!=='SHEET_WEB_APP_URL')d=await fetchSheet();
   if(!d)d=loadLocal();
-  if(d){
+  if(d&&!d.__reset&&Object.keys(d).length>1){
     S={...S,...d};
     if(!S.categories||!S.categories.length)S.categories=DEF_CATS;
     if(!S.periods&&S.periodStart){S.periods=[{id:gid(),budget:S.budget||38000,start:S.periodStart,end:S.periodEnd}];delete S.budget;delete S.periodStart;delete S.periodEnd}
@@ -1055,9 +1055,8 @@ function renderComparePeriodDetail(p){
 async function syncNow(){if(SHEET_URL==='SHEET_WEB_APP_URL'){toast('⚠️ Sheet URL not configured');return}toast('Syncing...');const ok=await syncSheet(S);if(ok){S.lastSync=new Date().toISOString();localStorage.setItem('budgr',JSON.stringify(S));document.getElementById('lsl').textContent=fmtSync(S.lastSync);toast('✅ Synced!')}else toast('❌ Sync failed')}
 function askReset(){askConfirm('Reset all data?','Permanently deletes ALL data including cloud sync. Cannot be undone.',async()=>{
   localStorage.removeItem('budgr');
-  // also clear Sheet data
   if(SHEET_URL!=='SHEET_WEB_APP_URL'){
-    try{await fetch(SHEET_URL+'?action=save&data='+encodeURIComponent(JSON.stringify({})),{redirect:'follow'});}catch{}
+    try{await fetch(SHEET_URL+'?action=save&data='+encodeURIComponent(JSON.stringify({__reset:true})),{redirect:'follow'});}catch{}
   }
   location.reload();
 })}
