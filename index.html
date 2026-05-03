@@ -78,12 +78,19 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
 .hdots{display:flex;justify-content:center;gap:5px;margin-top:8px}
 .hdot{width:5px;height:5px;border-radius:50%;background:var(--surface3);transition:all .3s}
 .hdot.active{background:var(--cyan);width:16px;border-radius:3px;box-shadow:0 0 6px var(--cyan-glow)}
-.budget-hero{background:linear-gradient(135deg,#0c1a2e 0%,#0e2040 50%,#0b1e3a 100%);border:1px solid rgba(91,141,238,.25);border-radius:var(--radius);padding:22px 20px 18px;position:relative;overflow:hidden;user-select:none;box-shadow:0 8px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(91,141,238,.1)}
-.budget-hero::before{content:'';position:absolute;top:-50px;right:-30px;width:220px;height:220px;background:radial-gradient(circle,rgba(56,189,248,.1) 0%,rgba(91,141,238,.06) 50%,transparent 70%);animation:orb 6s ease-in-out infinite}
+.budget-hero{background:linear-gradient(135deg,#0c1a2e 0%,#0e2040 50%,#0b1e3a 100%);border-radius:var(--radius);padding:22px 20px 18px;position:relative;overflow:hidden;user-select:none}
+.budget-hero::before{content:'';position:absolute;top:-50px;right:-30px;width:220px;height:220px;background:radial-gradient(circle,rgba(56,189,248,.1) 0%,rgba(91,141,238,.06) 50%,transparent 70%);animation:orb 6s ease-in-out infinite;z-index:0}
+/* Animated glow border wrapper */
+.hero-wrap .budget-hero{--glow-a:rgba(56,189,248,.7);--glow-b:rgba(91,141,238,.8);--glow-c:rgba(45,212,191,.6)}
+.budget-hero::after{content:'';position:absolute;inset:-1px;border-radius:calc(var(--radius) + 1px);padding:1px;background:linear-gradient(var(--angle,135deg),var(--glow-a),var(--glow-b),var(--glow-c),var(--glow-a));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:borderSpin 3s linear infinite;pointer-events:none;z-index:1}
+@keyframes borderSpin{0%{--angle:0deg}100%{--angle:360deg}}
+@property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
 .budget-hero.future{border-color:rgba(251,191,36,.25);background:linear-gradient(135deg,#0c1a1a 0%,#0e2020 100%);box-shadow:0 8px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(251,191,36,.08)}
 .budget-hero.past{border-color:rgba(52,77,107,.4);opacity:.85}
 .bpl{font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:3px;font-family:'DM Mono',monospace;opacity:.75}
 .bmo{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;margin-bottom:14px;letter-spacing:-.3px}
+.budget-hero{box-shadow:0 8px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(91,141,238,.1);animation:heroGlow 3s ease-in-out infinite}
+@keyframes heroGlow{0%,100%{box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 20px rgba(56,189,248,.08),inset 0 1px 0 rgba(91,141,238,.1)}50%{box-shadow:0 8px 50px rgba(0,0,0,.45),0 0 35px rgba(91,141,238,.2),0 0 60px rgba(56,189,248,.08),inset 0 1px 0 rgba(56,189,248,.15)}}
 .bamt{font-family:'DM Mono',monospace;font-size:34px;font-weight:500;letter-spacing:-1px;margin-bottom:3px;text-shadow:0 0 30px rgba(45,212,191,.15)}
 .bamt .cy{font-size:18px;color:var(--cyan);margin-right:2px;opacity:.8}
 .bprog{width:100%;height:5px;background:rgba(255,255,255,.06);border-radius:99px;margin:12px 0 10px;overflow:hidden}
@@ -96,9 +103,27 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
 .bsv.g{color:var(--teal);text-shadow:0 0 8px var(--teal-glow)}.bsv.r{color:var(--danger)}.bsv.y{color:var(--amber)}
 
 /* DAILY CARD */
-.daily-card{background:linear-gradient(135deg,#0a1828,#0c1e32);border:1px solid rgba(56,189,248,.18);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(0,0,0,.3),inset 0 1px 0 rgba(56,189,248,.06)}
+.daily-card{background:linear-gradient(135deg,#0a1828,#0c1e32);border:1px solid rgba(56,189,248,.18);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.3),inset 0 1px 0 rgba(56,189,248,.06)}
 .dlbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;font-weight:600}
 .damt{font-family:'DM Mono',monospace;font-size:26px;font-weight:700;color:var(--teal);text-shadow:0 0 20px var(--teal-glow)}
+.daily-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.daily-card-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(56,189,248,.08)}
+.carry-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:700}
+.carry-pos{color:var(--teal)}.carry-neg{color:var(--danger)}.carry-zero{color:var(--text3)}
+.btn-recalc{padding:6px 12px;font-size:11px;font-weight:600;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.08);color:var(--cyan);border-radius:8px;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:.3px;transition:all .2s;white-space:nowrap}
+.btn-recalc:active{background:rgba(56,189,248,.18)}
+.btn-recalc.done{border-color:rgba(45,212,191,.25);background:rgba(45,212,191,.06);color:var(--teal);cursor:default;opacity:.7}
+.forecast-row{display:grid;grid-template-columns:32px 52px 1fr 1fr 1fr 18px;align-items:center;gap:4px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.forecast-row:last-child{border-bottom:none}
+.forecast-row.today{background:rgba(56,189,248,.06);border-radius:8px;padding:9px 8px;margin:0 -8px}
+.forecast-row.past{opacity:.6}
+.fc-day{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);font-weight:600}
+.fc-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--text2)}
+.fc-budget{font-family:'DM Mono',monospace;font-weight:700;color:var(--text)}
+.fc-used{font-family:'DM Mono',monospace;color:var(--text2)}
+.fc-carry{font-family:'DM Mono',monospace;font-weight:600}
+.fc-icon{font-size:11px;text-align:right}
+.day-counter{font-size:10px;color:var(--text3);letter-spacing:.5px;margin-top:2px}
 
 /* QUICK ADD */
 .quick-add{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
@@ -256,11 +281,24 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
         <div id="today-btn" onclick="goToday()" style="display:none;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--accent);background:rgba(124,106,247,.15);border:1px solid rgba(124,106,247,.4);border-radius:99px;padding:3px 10px;cursor:pointer">Today</div>
       </div>
     </div>
-    <div class="daily-card" id="daily-card">
-      <div><div class="dlbl" id="dlbl">Daily Budget</div><div class="damt">฿<span id="db">0</span></div><div style="font-size:12px;color:var(--text3);margin-top:2px" id="ddl">—</div></div>
-      <div style="text-align:right" id="today-col">
-        <div class="dlbl">Today Spent</div>
-        <div style="font-family:'DM Mono',monospace;font-size:18px;color:var(--expense)">฿<span id="tsp">0</span></div>
+    <div class="daily-card" id="daily-card" onclick="openForecast()" style="cursor:pointer">
+      <div class="daily-card-top">
+        <div>
+          <div class="dlbl" id="dlbl">Today's Budget</div>
+          <div class="damt">฿<span id="db">0</span></div>
+          <div class="day-counter" id="ddl">—</div>
+        </div>
+        <div style="text-align:right" id="today-col">
+          <div class="dlbl">Today Spent</div>
+          <div style="font-family:'DM Mono',monospace;font-size:18px;color:var(--expense)">฿<span id="tsp">0</span></div>
+        </div>
+      </div>
+      <div class="daily-card-bottom" id="daily-card-bottom">
+        <div>
+          <div class="dlbl">Base <span id="dc-base" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)">฿0</span>
+          &nbsp;Carry <span id="dc-carry" class="carry-val carry-zero">฿0</span></div>
+        </div>
+        <button class="btn-recalc" id="btn-recalc" onclick="doRecalculate()">⟳ Recalculate</button>
       </div>
     </div>
     <div class="quick-add">
@@ -393,6 +431,17 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
   <div style="font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6" id="conf-m">This cannot be undone.</div>
   <div class="row"><button class="btn btn-secondary" onclick="closeModal('mconf')">Cancel</button><button class="btn btn-danger" id="conf-ok">Confirm</button></div>
 </div></div>
+
+<!-- Forecast Modal -->
+<div class="modal-backdrop" id="mforecast">
+  <div class="modal">
+    <div class="mh"></div>
+    <div class="mt">Daily Budget Forecast</div>
+    <div class="ms" id="forecast-sub">—</div>
+    <div id="forecast-list"></div>
+    <div style="margin-top:16px"><button class="btn btn-secondary" onclick="closeModal('mforecast')">Close</button></div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 <canvas id="ccanvas"></canvas>
@@ -542,8 +591,105 @@ function netBudget(p){if(!p)return 0;return(parseFloat(p.budget)||0)-subsPeriod(
 function remBudget(p){if(!p)return 0;return netBudget(p)-pExp(p)+pInc(p)}
 function daysInPeriod(p){if(!p)return 1;return Math.max(1,Math.round((parseLD(p.end)-parseLD(p.start))/864e5)+1)}
 function daysLeft(p){if(!p)return 0;const today=new Date();today.setHours(0,0,0,0);const end=parseLD(p.end);end.setHours(0,0,0,0);return Math.max(0,Math.round((end-today)/864e5)+1)}
-function dailyB(p){if(!p)return 0;return remBudget(p)/Math.max(1,daysLeft(p))}
 function todaySpent(){const t=todayStr();return(S.transactions||[]).filter(x=>x.date===t&&x.type==='expense').reduce((s,x)=>s+(parseFloat(x.amount)||0),0)}
+
+// ── NEW DAILY BUDGET LOGIC ──
+
+// Get base daily budget for a given date within a period
+// Uses recalcHistory if available, otherwise baseDailyBudget
+function getBaseForDate(p, dateStr) {
+  const base = p.baseDailyBudget || netBudget(p) / Math.max(1, daysInPeriod(p));
+  const history = p.recalcHistory || [];
+  // Find most recent recalc on or before this date
+  const applicable = history.filter(r => r.date <= dateStr).sort((a,b) => b.date.localeCompare(a.date));
+  if (applicable.length > 0) return applicable[0].newBase;
+  return base;
+}
+
+// Check if a date is right after a recalculate (carryover resets)
+function isRecalcDay(p, dateStr) {
+  const history = p.recalcHistory || [];
+  return history.some(r => r.date === dateStr);
+}
+
+// Get all dates in a period as array of strings
+function getPeriodDates(p) {
+  const dates = [];
+  const cur = parseLD(p.start);
+  const end = parseLD(p.end);
+  while (cur <= end) {
+    dates.push(fmtDate(cur));
+    cur.setDate(cur.getDate() + 1);
+  }
+  return dates;
+}
+
+// Calculate daily budget for a specific date (with full carryover chain)
+// carry(D) = full remaining balance = budget(D) + income(D) - expense(D)
+// budget(D+1) = base(D+1) + carry(D)
+// includeToday=true → also apply today's transactions (real-time display)
+function calcDailyBudget(p, dateStr, includeToday) {
+  const dates = getPeriodDates(p);
+  const idx = dates.indexOf(dateStr);
+  if (idx < 0) return getBaseForDate(p, dateStr);
+
+  let carry = 0; // carry coming INTO the current day
+  for (let i = 0; i < idx; i++) {
+    const d = dates[i];
+    const base = getBaseForDate(p, d);
+    const budget = base + carry;
+    const remaining = budget + dayIncome(p, d) - dayExpense(p, d);
+    // carry going out = full remaining balance
+    carry = remaining;
+    // if next day is recalc, carry resets (recalc absorbs it into new base)
+    if (i + 1 < dates.length && isRecalcDay(p, dates[i + 1])) carry = 0;
+  }
+
+  const todayBase = getBaseForDate(p, dateStr);
+  const todayBudget = todayBase + carry;
+
+  if (includeToday) {
+    return todayBudget + dayIncome(p, dateStr) - dayExpense(p, dateStr);
+  }
+  return todayBudget;
+}
+
+// Income for a specific date within period
+function dayIncome(p, dateStr) {
+  return (S.transactions||[]).filter(t=>t.date===dateStr&&t.type==='income'&&t.date>=p.start&&t.date<=p.end).reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+}
+// Expense for a specific date within period (non-subscription)
+function dayExpense(p, dateStr) {
+  return (S.transactions||[]).filter(t=>t.date===dateStr&&t.type==='expense'&&t.date>=p.start&&t.date<=p.end).reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+}
+
+// Get carryover coming INTO today (full remaining from yesterday)
+function getTodayCarryover(p) {
+  const t = todayStr();
+  const base = getBaseForDate(p, t);
+  const budgetWithCarry = calcDailyBudget(p, t, false);
+  return budgetWithCarry - base; // = carry that came in from yesterday
+}
+
+// Check if recalculate already done today for this period
+function recalcDoneToday(p) {
+  const t = todayStr();
+  return (p.recalcHistory||[]).some(r => r.date === t);
+}
+
+// Ensure period has baseDailyBudget set
+function ensureBase(p) {
+  if (!p.baseDailyBudget) {
+    p.baseDailyBudget = netBudget(p) / Math.max(1, daysInPeriod(p));
+  }
+}
+
+// Daily budget for current period today (live - includes today's transactions)
+function dailyB(p) {
+  if (!p) return 0;
+  ensureBase(p);
+  return calcDailyBudget(p, todayStr(), true);
+}
 
 // ═══ RENDER HOME ═══
 function renderHome(){
@@ -571,9 +717,52 @@ function renderHome(){
   const bar=document.getElementById('hpb');bar.style.width=pct+'%';bar.className='bpb'+(pct>=90?' d':pct>=70?' w':'');
   document.getElementById('bhero').className='budget-hero'+(status==='future'?' future':status==='past'?' past':'');
   const tcol=document.getElementById('today-col');
-  if(status==='current'){const dl=daysLeft(p);document.getElementById('dlbl').textContent='Daily Budget';document.getElementById('db').textContent=fmtN(Math.max(0,remBudget(p)/Math.max(1,dl)));document.getElementById('ddl').textContent=dl+' day'+(dl!==1?'s':'')+' left in this period';tcol.style.display='block';document.getElementById('tsp').textContent=fmtN(todaySpent());}
-  else if(status==='past'){document.getElementById('dlbl').textContent='Savings';document.getElementById('db').textContent=fmtN(Math.max(0,rem));document.getElementById('ddl').textContent='Period ended · '+daysInPeriod(p)+' days';tcol.style.display='none';}
-  else{document.getElementById('dlbl').textContent='Projected Daily';document.getElementById('db').textContent=fmtN(Math.max(0,netBudget(p)/Math.max(1,daysInPeriod(p))));document.getElementById('ddl').textContent=daysInPeriod(p)+' days · starts '+p.start;tcol.style.display='none';}
+  if(status==='current'){
+    ensureBase(p);
+    const dl=daysLeft(p);
+    const todayDB=dailyB(p);
+    const base=getBaseForDate(p,todayStr());
+    const carry=getTodayCarryover(p);
+    const dayNum=getPeriodDates(p).indexOf(todayStr())+1;
+    const totalDays=daysInPeriod(p);
+    document.getElementById('dlbl').textContent="Today's Budget";
+    document.getElementById('db').textContent=fmtN(todayDB);
+    document.getElementById('db').style.color=todayDB<0?'var(--danger)':'';
+    document.getElementById('ddl').textContent='Day '+dayNum+' of '+totalDays+' · '+dl+' day'+(dl!==1?'s':'')+' left';
+    tcol.style.display='block';
+    document.getElementById('tsp').textContent=fmtN(todaySpent());
+    // Base + carry
+    document.getElementById('dc-base').textContent='฿'+fmtN(base);
+    const carryEl=document.getElementById('dc-carry');
+    if(carry>0.005){carryEl.textContent='+฿'+fmtN(carry);carryEl.className='carry-val carry-pos';}
+    else if(carry<-0.005){carryEl.textContent='-฿'+fmtN(Math.abs(carry));carryEl.className='carry-val carry-neg';}
+    else{carryEl.textContent='฿0';carryEl.className='carry-val carry-zero';}
+    // Recalculate button
+    const recalcBtn=document.getElementById('btn-recalc');
+    const bottomRow=document.getElementById('daily-card-bottom');
+    if(recalcBtn){
+      if(recalcDoneToday(p)){recalcBtn.textContent='✓ Recalculated today';recalcBtn.className='btn-recalc done';recalcBtn.disabled=true;}
+      else{recalcBtn.textContent='⟳ Recalculate';recalcBtn.className='btn-recalc';recalcBtn.disabled=false;}
+    }
+    if(bottomRow)bottomRow.style.display='flex';
+  }
+  else if(status==='past'){
+    document.getElementById('dlbl').textContent='Savings';
+    document.getElementById('db').textContent=fmtN(Math.max(0,rem));
+    document.getElementById('db').style.color='';
+    document.getElementById('ddl').textContent='Period ended · '+daysInPeriod(p)+' days';
+    tcol.style.display='none';
+    const bottomRow=document.getElementById('daily-card-bottom');if(bottomRow)bottomRow.style.display='none';
+  }
+  else{
+    ensureBase(p);
+    document.getElementById('dlbl').textContent='Projected Daily';
+    document.getElementById('db').textContent=fmtN(Math.max(0,p.baseDailyBudget||netBudget(p)/Math.max(1,daysInPeriod(p))));
+    document.getElementById('db').style.color='';
+    document.getElementById('ddl').textContent=daysInPeriod(p)+' days · starts '+p.start;
+    tcol.style.display='none';
+    const bottomRow=document.getElementById('daily-card-bottom');if(bottomRow)bottomRow.style.display='none';
+  }
   const tp=todayPeriod();const meb=document.getElementById('meb');
   if(tp&&tp.id===p.id&&daysLeft(p)===0){meb.classList.add('show');if(rem>0){document.getElementById('be').textContent='🏆';document.getElementById('bt').textContent='Period complete! You saved money!';document.getElementById('bs').textContent=`฿${fmtN(rem)} left · ${(S.streak||0)+1} month streak 🔥`;}else{document.getElementById('be').textContent='📅';document.getElementById('bt').textContent='Period ended';document.getElementById('bs').textContent='Ready for a new period?';}}else meb.classList.remove('show');
   const subItems=subsForPeriod(p);
@@ -626,7 +815,22 @@ async function delTx(id){askConfirm('Delete transaction?','This cannot be undone
 function openAddPeriod(id){editPeriodId=id||null;const p=id?(S.periods||[]).find(x=>x.id===id):null;document.getElementById('pmt').textContent=id?'Edit Period':'New Budget Period';document.getElementById('pb').value=p?p.budget:'';document.getElementById('ps').value=p?p.start:'';document.getElementById('pe').value=p?p.end:'';updPP();openModal('mperiod');}
 function updPP(){const b=parseFloat(document.getElementById('pb').value)||0,s=document.getElementById('ps').value,e=document.getElementById('pe').value,el=document.getElementById('pp');if(b&&s&&e){const days=Math.max(1,Math.round((parseLD(e)-parseLD(s))/864e5)+1);const subs=subsPeriod({budget:b,start:s,end:e});el.textContent=`${days} days · ฿${fmtN(subs)} in subscriptions · ฿${fmtN(Math.max(0,(b-subs)/days))}/day`;}else el.textContent='—';}
 ['pb','ps','pe'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',updPP);});
-async function savePeriod(){const b=parseFloat(document.getElementById('pb').value),s=document.getElementById('ps').value,e=document.getElementById('pe').value;if(!b||b<=0){toast('Enter valid budget');return}if(!s||!e){toast('Set dates');return}if(e<=s){toast('End must be after start');return}S.periods=S.periods||[];if(editPeriodId){const i=S.periods.findIndex(p=>p.id===editPeriodId);if(i>-1)S.periods[i]={...S.periods[i],budget:b,start:s,end:e};}else S.periods.push({id:gid(),budget:b,start:s,end:e});await save();closeModal('mperiod');renderSettings();renderHome();toast('Period saved!');}
+async function savePeriod(){
+  const b=parseFloat(document.getElementById('pb').value),s=document.getElementById('ps').value,e=document.getElementById('pe').value;
+  if(!b||b<=0){toast('Enter valid budget');return}if(!s||!e){toast('Set dates');return}if(e<=s){toast('End must be after start');return}
+  S.periods=S.periods||[];
+  const mockP={budget:b,start:s,end:e,subscriptions:S.subscriptions};
+  const days=Math.max(1,Math.round((parseLD(e)-parseLD(s))/864e5)+1);
+  const subs=subsPeriod({budget:b,start:s,end:e});
+  const base=(b-subs)/days;
+  if(editPeriodId){
+    const i=S.periods.findIndex(p=>p.id===editPeriodId);
+    if(i>-1)S.periods[i]={...S.periods[i],budget:b,start:s,end:e,baseDailyBudget:base};
+  }else{
+    S.periods.push({id:gid(),budget:b,start:s,end:e,baseDailyBudget:base,recalcHistory:[]});
+  }
+  await save();closeModal('mperiod');renderSettings();renderHome();toast('Period saved!');
+}
 function delPeriod(id){askConfirm('Delete this period?','Transactions remain but the period will be removed.',async()=>{S.periods=(S.periods||[]).filter(p=>p.id!==id);const sorted=sortedPeriods();selPeriodIdx=Math.max(0,Math.min(sorted.length-1,selPeriodIdx));await save();renderSettings();renderHome();toast('Period deleted');});}
 
 // ═══ SUBSCRIPTIONS ═══
@@ -744,6 +948,142 @@ function drawCompare(){
   rChart=new Chart(ctx,{type:'bar',data:{labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9090aa',font:{size:11}}},tooltip:{callbacks:{label:c=>` ฿${fmtN(c.parsed.y)}`}}},scales:{x:{ticks:{color:'#9090aa'},grid:{display:false}},y:{ticks:{color:'#9090aa',callback:v=>'฿'+fmtN(v)},grid:{color:'#2a2a3a'}}},onClick:(e,els)=>{if(!els.length){document.getElementById('compd').innerHTML='';return;}const idx=els[0].index;const clickedP=slots[idx];if(clickedP)renderComparePeriodDetail(clickedP);else document.getElementById('compd').innerHTML='<div class="empty"><div class="empty-sub">No data for this slot</div></div>';}}});
 }
 function renderComparePeriodDetail(p){const el=document.getElementById('compd');if(!el)return;const cat=cCatId?getCat(cCatId):null;const ctype=window._cType;let txs,subs=[];if(cCatId){subs=subsForPeriod(p).filter(s=>s.category===cCatId);txs=pTxs(p).filter(t=>t.category===cCatId).sort((a,b)=>b.date.localeCompare(a.date));}else{const type=ctype==='income'?'income':'expense';subs=type==='expense'?subsForPeriod(p):[];txs=pTxs(p).filter(t=>t.type===type).sort((a,b)=>b.date.localeCompare(a.date));}el.innerHTML=`<div class="sh" style="margin-top:16px"><div class="stitle">${periodName(p)}${cat?' · '+cat.icon+' '+cat.name:''}</div></div>`+subs.map(subPinnedHTML).join('')+(txs.length?txs.map(txHTML).join(''):'<div class="empty"><div class="empty-sub">No transactions</div></div>');}
+
+// ═══ RECALCULATE ═══
+async function doRecalculate(){
+  const p=getActive();
+  if(!p){toast('No active period');return;}
+  if(recalcDoneToday(p)){toast('Already recalculated today');return;}
+  const t=todayStr();
+  const dl=daysLeft(p);
+  if(dl<=0){toast('Period has ended');return;}
+  // remaining budget = netBudget - all expenses so far + all income so far
+  const rem=remBudget(p);
+  const newBase=rem/Math.max(1,dl);
+  // Confirm
+  askConfirm(
+    'Recalculate daily budget?',
+    'New daily budget: ฿'+fmtN(newBase)+' for the next '+dl+' day'+(dl!==1?'s':'')+' (including today)',
+    async()=>{
+      if(!p.recalcHistory)p.recalcHistory=[];
+      p.recalcHistory.push({date:t,newBase:newBase});
+      // Update period in state
+      const idx=S.periods.findIndex(x=>x.id===p.id);
+      if(idx>-1)S.periods[idx]=p;
+      await save();renderHome();toast('✓ Daily budget recalculated');
+    }
+  );
+}
+
+// ═══ FORECAST ═══
+function openForecast(){
+  const p = getActive();
+  if(!p){ toast('No active period'); return; }
+  ensureBase(p);
+
+  const dates = getPeriodDates(p);
+  const totalDays = dates.length;
+  const today = todayStr();
+  const recalcDates = new Set((p.recalcHistory||[]).map(r=>r.date));
+
+  document.getElementById('forecast-sub').textContent = periodName(p) + ' · ' + totalDays + ' days';
+
+  // Build rows
+  // We simulate the carryover chain day by day
+  let runningCarry = 0;
+  const rows = dates.map((d, i) => {
+    const dayNum = i + 1;
+    const base = getBaseForDate(p, d);
+    const isToday = d === today;
+    const isPast = d < today;
+    const isFuture = d > today;
+
+    // Daily budget = base + carry coming IN from yesterday
+    const budget = base + runningCarry;
+
+    // Net spend for this day (past/today = actual, future = 0 projected)
+    const actualInc = dayIncome(p, d);
+    const actualExp = dayExpense(p, d);
+    const netSpend = (isPast || isToday) ? (actualExp - actualInc) : 0;
+
+    // Used display: past/today = actual expense (for display), future = null
+    const used = (isPast || isToday) ? actualExp - actualInc : null;
+
+    // Carry OUT = full remaining balance after this day
+    const carryOut = budget - netSpend;
+
+    // Next day gets this carry
+    const carryToNext = carryOut;
+
+    // If next day is recalc day, carry resets to 0
+    if (i + 1 < dates.length && recalcDates.has(dates[i + 1])) {
+      runningCarry = 0;
+    } else {
+      runningCarry = carryToNext;
+    }
+
+    return { dayNum, d, base, budget, used, carryToNext, isToday, isPast, isFuture, wasRecalc: recalcDates.has(d) };
+  });
+
+  const listEl = document.getElementById('forecast-list');
+
+  // Header row
+  const header = `<div class="forecast-row" style="opacity:.5;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border2);padding-bottom:6px;margin-bottom:4px">
+    <div>Day</div><div>Date</div><div>Budget</div><div>Used</div><div>Carry</div><div></div>
+  </div>`;
+
+  const rowsHTML = rows.map(r => {
+    const dateObj = parseLD(r.d);
+    const dateLabel = dateObj.toLocaleString('en',{month:'short',day:'numeric'});
+
+    // Budget cell
+    const budgetColor = r.budget < 0 ? 'color:var(--danger)' : r.isToday ? 'color:var(--teal)' : '';
+    const budgetHTML = `<div class="fc-budget" style="${budgetColor}">฿${fmtN(r.budget)}</div>`;
+
+    // Used cell
+    let usedHTML;
+    if (r.used === null) {
+      usedHTML = `<div class="fc-used" style="color:var(--text3)">—</div>`;
+    } else {
+      const spent = r.used; // net spend (positive = net expense)
+      usedHTML = `<div class="fc-used" style="color:${spent > 0 ? 'var(--expense)' : 'var(--income)'}">฿${fmtN(Math.abs(spent))}</div>`;
+    }
+
+    // Carry cell
+    const carry = r.carryToNext;
+    let carryHTML;
+    if (r.isFuture && r.used === null) {
+      // projected
+      carryHTML = `<div class="fc-carry" style="color:var(--text3);font-style:italic">~฿${fmtN(Math.abs(carry))}</div>`;
+    } else {
+      const cls = carry > 0.005 ? 'color:var(--teal)' : carry < -0.005 ? 'color:var(--danger)' : 'color:var(--text3)';
+      const sign = carry > 0.005 ? '+' : carry < -0.005 ? '-' : '';
+      carryHTML = `<div class="fc-carry" style="${cls}">${sign}฿${fmtN(Math.abs(carry))}</div>`;
+    }
+
+    // Icon cell
+    const iconHTML = r.wasRecalc
+      ? `<div class="fc-icon" title="Recalculated">⟳</div>`
+      : `<div class="fc-icon"></div>`;
+
+    // Status indicator
+    const statusPrefix = r.isPast ? '✓' : r.isToday ? '►' : ' ';
+
+    const rowClass = `forecast-row${r.isToday ? ' today' : r.isPast ? ' past' : ''}`;
+
+    return `<div class="${rowClass}">
+      <div class="fc-day">${statusPrefix}${r.dayNum}</div>
+      <div class="fc-date">${dateLabel}</div>
+      ${budgetHTML}
+      ${usedHTML}
+      ${carryHTML}
+      ${iconHTML}
+    </div>`;
+  }).join('');
+
+  listEl.innerHTML = header + rowsHTML;
+  openModal('mforecast');
+}
 
 // ═══ SYNC / RESET ═══
 async function syncNow(){toast('Syncing...');const ok=await syncSheet(S);if(ok){S.lastSync=new Date().toISOString();localStorage.setItem('budgr',JSON.stringify(S));document.getElementById('lsl').textContent=fmtSync(S.lastSync);toast('✅ Synced!');}else toast('❌ Sync failed');}
