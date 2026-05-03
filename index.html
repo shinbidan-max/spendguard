@@ -448,7 +448,8 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
 
 <script>
 // ═══ CONFIG ═══
-const SHEET_URL='https://script.google.com/macros/s/AKfycbwXZCNDK_uxtiM4SNcSheAKC8qY1WuGu4qBFp6yqPUvMISqQznnI0DL3C4fkpt7X2y8gw/exec';
+const SUPA_URL='https://jxclvwluqmvmtrsdrjvd.supabase.co';
+const SUPA_KEY='sb_publishable_ct0wQhsJg0GENa3uKX6KIg_H3nMD4-R';
 const DEF_CATS=[
   {id:'c1',name:'Salary',type:'income',icon:'💼'},{id:'c2',name:'Freelance',type:'income',icon:'💻'},
   {id:'c3',name:'Investment Returns',type:'income',icon:'📈'},{id:'c4',name:'Other Income',type:'income',icon:'💰'},
@@ -471,25 +472,39 @@ async function hashPwd(p){const b=await crypto.subtle.digest('SHA-256',new TextE
 
 // ═══ STORAGE ═══
 function getUserKey(){
-  // Use first 16 chars of password hash as user key (set after login)
   return localStorage.getItem('budgr_userkey')||'budgr_main';
 }
+
+// ── Supabase REST API helpers ──
+const SUPA_HEADERS={
+  'apikey': SUPA_KEY,
+  'Authorization': 'Bearer '+SUPA_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'resolution=merge-duplicates'
+};
 
 async function syncSheet(d){
   try{
     const key=getUserKey();
-    const data=encodeURIComponent(JSON.stringify(d));
-    const url=SHEET_URL+'?action=save&key='+encodeURIComponent(key)+'&data='+data;
-    const r=await fetch(url,{redirect:'follow'});
-    return(await r.json()).success;
+    const body=JSON.stringify({userkey:key, data:JSON.stringify(d), updated_at:new Date().toISOString()});
+    const r=await fetch(SUPA_URL+'/rest/v1/userdata?on_conflict=userkey',{
+      method:'POST',
+      headers:{...SUPA_HEADERS,'Prefer':'resolution=merge-duplicates'},
+      body
+    });
+    return r.status===200||r.status===201;
   }catch{return false}
 }
+
 async function fetchSheet(){
   try{
     const key=getUserKey();
-    const r=await fetch(SHEET_URL+'?action=load&key='+encodeURIComponent(key),{redirect:'follow'});
-    const j=await r.json();
-    return j.data?JSON.parse(j.data):null;
+    const r=await fetch(SUPA_URL+'/rest/v1/userdata?userkey=eq.'+encodeURIComponent(key)+'&select=data',{
+      headers:{...SUPA_HEADERS}
+    });
+    const rows=await r.json();
+    if(!rows||!rows.length||!rows[0].data)return null;
+    return JSON.parse(rows[0].data);
   }catch{return null}
 }
 async function save(){
@@ -1217,8 +1232,17 @@ function openForecast(){
 }
 
 // ═══ SYNC / RESET ═══
-async function syncNow(){toast('Syncing...');const ok=await syncSheet(S);if(ok){S.lastSync=new Date().toISOString();localStorage.setItem('budgr',JSON.stringify(S));document.getElementById('lsl').textContent=fmtSync(S.lastSync);toast('✅ Synced!');}else toast('❌ Sync failed');}
-function askReset(){askConfirm('Reset all data?','Permanently deletes ALL data. Cannot be undone.',async()=>{localStorage.removeItem('budgr');try{await syncSheet({__reset:true});}catch{}clearSession();localStorage.removeItem('budgr_userkey');location.reload();});}
+async function syncNow(){toast('Syncing...');const ok=await syncSheet(S);if(ok){S.lastSync=new Date().toISOString();localStorage.setItem('budgr',JSON.stringify(S));const el=document.getElementById('lsl');if(el)el.textContent=fmtSync(S.lastSync);toast('✅ Synced!');}else toast('❌ Sync failed');}
+function askReset(){askConfirm('Reset all data?','Permanently deletes ALL data. Cannot be undone.',async()=>{
+  localStorage.removeItem('budgr');
+  try{
+    const key=getUserKey();
+    await fetch(SUPA_URL+'/rest/v1/userdata?userkey=eq.'+encodeURIComponent(key),{
+      method:'DELETE',headers:{...SUPA_HEADERS}
+    });
+  }catch{}
+  clearSession();localStorage.removeItem('budgr_userkey');location.reload();
+});}
 
 // ═══ CONFETTI ═══
 function confetti(){const c=document.getElementById('ccanvas');c.style.display='block';const x=c.getContext('2d');c.width=window.innerWidth;c.height=window.innerHeight;const ps=Array.from({length:80},()=>({x:Math.random()*c.width,y:Math.random()*-c.height,r:Math.random()*6+2,d:Math.random()*80+10,col:['#7c6af7','#f7c86a','#6af7b8','#f76a6a','#fff'][Math.floor(Math.random()*5)],t:Math.random()*10-10,ti:Math.random()*.07+.05}));let a=0,f=0;function draw(){x.clearRect(0,0,c.width,c.height);a+=.01;ps.forEach(p=>{x.beginPath();x.fillStyle=p.col;x.ellipse(p.x,p.y,p.r,p.r*.4,p.t,0,Math.PI*2);x.fill();p.y+=Math.cos(a+p.d)+2;p.x+=Math.sin(a)*1.5;p.t+=p.ti;});f++;if(f<120)requestAnimationFrame(draw);else{x.clearRect(0,0,c.width,c.height);c.style.display='none';}}draw();}
