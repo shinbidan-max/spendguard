@@ -801,6 +801,15 @@ function ensureBase(p) {
   }
 }
 
+// Recalculate baseDailyBudget for ALL periods (call after subscription changes)
+function recalcAllBases() {
+  (S.periods||[]).forEach(p => {
+    const days = Math.max(1, Math.round((parseLD(p.end)-parseLD(p.start))/864e5)+1);
+    const subs = subsPeriod(p);
+    p.baseDailyBudget = ((parseFloat(p.budget)||0) - subs) / days;
+  });
+}
+
 // Daily budget for current period today (live - includes today's transactions)
 function dailyB(p) {
   if (!p) return 0;
@@ -953,8 +962,8 @@ function delPeriod(id){askConfirm('Delete this period?','Transactions remain but
 // ═══ SUBSCRIPTIONS ═══
 function toggleSubEnd(){document.getElementById('sef').style.display=document.getElementById('sne').checked?'none':'block';}
 function openAddSub(id){editSubId=id||null;const s=id?(S.subscriptions||[]).find(x=>x.id===id):null;document.getElementById('smt').textContent=id?'Edit Subscription':'Add Subscription';document.getElementById('sn').value=s?s.name:'';document.getElementById('sa').value=s?s.amount:'';document.getElementById('sf').value=s?s.freq:'1';document.getElementById('ssm').value=s?s.startMonth:new Date().toISOString().slice(0,7);const ne=s?!!s.noEnd:false;document.getElementById('sne').checked=ne;document.getElementById('sef').style.display=ne?'none':'block';document.getElementById('sem').value=s&&!s.noEnd?(s.endMonth||''):'';fillCatSel('sc','expense');if(s)document.getElementById('sc').value=s.category;openModal('msub');}
-async function saveSub(){const n=document.getElementById('sn').value.trim(),a=parseFloat(document.getElementById('sa').value),f=document.getElementById('sf').value,c=document.getElementById('sc').value,sm=document.getElementById('ssm').value,ne=document.getElementById('sne').checked,em=ne?'':document.getElementById('sem').value;if(!n){toast('Enter name');return}if(!a||a<=0){toast('Enter amount');return}if(!sm){toast('Set start month');return}const sub={id:editSubId||gid(),name:n,amount:a,freq:f,category:c,startMonth:sm,endMonth:em,noEnd:ne,active:true};S.subscriptions=S.subscriptions||[];if(editSubId){const i=S.subscriptions.findIndex(x=>x.id===editSubId);if(i>-1)S.subscriptions[i]=sub;else S.subscriptions.push(sub);}else S.subscriptions.push(sub);await save();closeModal('msub');renderSettings();toast('Subscription saved!');}
-function delSub(id){askConfirm('Delete subscription?','It will be removed from future calculations.',async()=>{S.subscriptions=(S.subscriptions||[]).filter(s=>s.id!==id);await save();renderSettings();toast('Subscription removed');});}
+async function saveSub(){const n=document.getElementById('sn').value.trim(),a=parseFloat(document.getElementById('sa').value),f=document.getElementById('sf').value,c=document.getElementById('sc').value,sm=document.getElementById('ssm').value,ne=document.getElementById('sne').checked,em=ne?'':document.getElementById('sem').value;if(!n){toast('Enter name');return}if(!a||a<=0){toast('Enter amount');return}if(!sm){toast('Set start month');return}const sub={id:editSubId||gid(),name:n,amount:a,freq:f,category:c,startMonth:sm,endMonth:em,noEnd:ne,active:true};S.subscriptions=S.subscriptions||[];if(editSubId){const i=S.subscriptions.findIndex(x=>x.id===editSubId);if(i>-1)S.subscriptions[i]=sub;else S.subscriptions.push(sub);}else S.subscriptions.push(sub);recalcAllBases();await save();closeModal('msub');renderSettings();renderHome();toast('Subscription saved!');}
+function delSub(id){askConfirm('Delete subscription?','It will be removed from future calculations.',async()=>{S.subscriptions=(S.subscriptions||[]).filter(s=>s.id!==id);recalcAllBases();await save();renderSettings();renderHome();toast('Subscription removed');});}
 
 // ═══ CATEGORIES ═══
 function openAddCat(){document.getElementById('cn').value='';document.getElementById('ci').value='';openModal('mcat');}
