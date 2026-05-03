@@ -496,14 +496,44 @@ async function init(){
   selPeriodIdx=ti>=0?ti:Math.max(0,sorted.length-1);
   document.getElementById('loader').style.display='none';
   if(!S.passwordHash){document.getElementById('ls').style.display='flex';openModal('msetup');}
-  else document.getElementById('ls').style.display='flex';
+  else if(isSessionValid()){
+    // Valid session → skip login
+    document.getElementById('ls').style.display='none';
+    document.getElementById('ma').classList.add('visible');
+    renderAll();
+  } else {
+    document.getElementById('ls').style.display='flex';
+  }
   setupSwipe();
 }
 
+// ── SESSION HELPERS ──
+const SESSION_KEY = 'budgr_session';
+const SESSION_DAYS = 30;
+
+function isSessionValid(){
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if(!raw) return false;
+    const s = JSON.parse(raw);
+    if(!s.expiry) return false;
+    return new Date().getTime() < s.expiry;
+  } catch { return false; }
+}
+
+function setSession(){
+  const expiry = new Date().getTime() + SESSION_DAYS * 24 * 60 * 60 * 1000;
+  localStorage.setItem(SESSION_KEY, JSON.stringify({expiry}));
+}
+
+function clearSession(){
+  localStorage.removeItem(SESSION_KEY);
+}
+
 // ═══ AUTH ═══
-async function doLogin(){const h=await hashPwd(document.getElementById('lpwd').value);if(h===S.passwordHash){document.getElementById('lerr').style.display='none';document.getElementById('ls').style.display='none';document.getElementById('ma').classList.add('visible');renderAll();}else document.getElementById('lerr').style.display='block';}
+async function doLogin(){const h=await hashPwd(document.getElementById('lpwd').value);if(h===S.passwordHash){document.getElementById('lerr').style.display='none';document.getElementById('ls').style.display='none';document.getElementById('ma').classList.add('visible');setSession();renderAll();}else document.getElementById('lerr').style.display='block';}
 document.getElementById('lpwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
-function doLogout(){document.getElementById('ma').classList.remove('visible');document.getElementById('ls').style.display='flex';document.getElementById('lpwd').value='';}
+function doLogout(){clearSession();document.getElementById('ma').classList.remove('visible');document.getElementById('ls').style.display='flex';document.getElementById('lpwd').value='';}
 async function saveSetup(){const p1=document.getElementById('sp1').value,p2=document.getElementById('sp2').value,err=document.getElementById('sperr');if(!p1){err.textContent='Cannot be empty';err.style.display='block';return}if(p1!==p2){err.textContent='Passwords do not match';err.style.display='block';return}S.passwordHash=await hashPwd(p1);await save();closeModal('msetup');err.style.display='none';toast('Password set!')}
 async function changePwd(){const c=document.getElementById('pc').value,n1=document.getElementById('pn').value,n2=document.getElementById('pcf').value,err=document.getElementById('pe2');if(await hashPwd(c)!==S.passwordHash){err.textContent='Current password incorrect';err.style.display='block';return}if(!n1){err.textContent='New password empty';err.style.display='block';return}if(n1!==n2){err.textContent='Passwords do not match';err.style.display='block';return}S.passwordHash=await hashPwd(n1);await save();closeModal('mpwd');toast('Password updated!')}
 
