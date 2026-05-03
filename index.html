@@ -237,7 +237,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
     <button class="btn btn-primary" onclick="doLogin()">Unlock</button>
     <div id="lerr" style="color:var(--danger);font-size:12px;text-align:center;margin-top:12px;display:none">Incorrect password</div>
   </div>
-  <div style="margin-top:24px;text-align:center;font-size:12px;color:var(--text3)">First time? <span style="color:var(--accent);cursor:pointer" onclick="openModal('msetup')">Set up password</span></div>
+  <div style="margin-top:24px;text-align:center;font-size:12px;color:var(--text3)">New user? Enter your desired password above and tap Unlock to get started.</div>
 </div>
 
 <!-- MAIN APP -->
@@ -500,6 +500,24 @@ function loadLocal(){try{const r=localStorage.getItem('budgr');return r?JSON.par
 // ═══ INIT ═══
 async function init(){
   document.getElementById('loader').style.display='flex';
+  document.getElementById('loader').style.display='none';
+  // Check if session still valid for a known user
+  const savedKey=localStorage.getItem('budgr_userkey');
+  if(savedKey&&isSessionValid()){
+    // Resume session — load data for this user
+    await loadUserData();
+    document.getElementById('ls').style.display='none';
+    document.getElementById('ma').classList.add('visible');
+    renderAll();
+  } else {
+    // No session — show login
+    document.getElementById('ls').style.display='flex';
+  }
+  setupSwipe();
+}
+
+// Load data for currently set userkey into S
+async function loadUserData(){
   let d=await fetchSheet();
   if(!d)d=loadLocal();
   if(d&&!d.__reset&&Object.keys(d).length>1){
@@ -507,22 +525,14 @@ async function init(){
     if(!S.categories||!S.categories.length)S.categories=DEF_CATS;
     if(!S.periods&&S.periodStart){S.periods=[{id:gid(),budget:S.budget||38000,start:S.periodStart,end:S.periodEnd}];delete S.budget;delete S.periodStart;delete S.periodEnd;}
     if(!S.periods)S.periods=[];
-  }else{S.categories=DEF_CATS;S.periods=[];}
+  }else{
+    // Fresh state for new user
+    S={periods:[],categories:DEF_CATS,subscriptions:[],transactions:[],streak:0,passwordHash:'',lastSync:null};
+  }
   const sorted=sortedPeriods();
   const t=todayStr();
   const ti=sorted.findIndex(p=>t>=p.start&&t<=p.end);
   selPeriodIdx=ti>=0?ti:Math.max(0,sorted.length-1);
-  document.getElementById('loader').style.display='none';
-  if(!S.passwordHash){document.getElementById('ls').style.display='flex';openModal('msetup');}
-  else if(isSessionValid()){
-    // Valid session → skip login
-    document.getElementById('ls').style.display='none';
-    document.getElementById('ma').classList.add('visible');
-    renderAll();
-  } else {
-    document.getElementById('ls').style.display='flex';
-  }
-  setupSwipe();
 }
 
 // ── SESSION HELPERS ──
@@ -551,43 +561,38 @@ function clearSession(){
 // ═══ AUTH ═══
 async function doLogin(){
   const pwd=document.getElementById('lpwd').value;
+  if(!pwd){toast('Enter password');return;}
   const h=await hashPwd(pwd);
-
-  // Multi-user: try loading data for this user from Sheet first
-  // userkey = first 16 chars of password hash
+  // Each user gets a unique Sheet key based on their password hash
   const userkey='user_'+h.slice(0,16);
-  localStorage.setItem('budgr_userkey', userkey);
 
-  // Try fetching this user's data
-  let userData = await fetchSheet();
+  // Show loader briefly while fetching
+  document.getElementById('loader').style.display='flex';
+  localStorage.setItem('budgr_userkey',userkey);
 
-  if(userData&&!userData.__reset&&Object.keys(userData).length>1){
-    // Found existing user data — check password matches
-    if(userData.passwordHash && userData.passwordHash !== h){
-      // Wrong password for this user slot (hash collision edge case, extremely rare)
-      document.getElementById('lerr').style.display='block';
-      localStorage.removeItem('budgr_userkey');
-      return;
-    }
-    // Valid existing user
-    S={...S,...userData};
-    if(!S.categories||!S.categories.length)S.categories=DEF_CATS;
-    if(!S.periods)S.periods=[];
-  } else if(!userData||userData.__reset||Object.keys(userData||{}).length<=1){
-    // New user — check if they have a local password set
-    const localData=loadLocal();
-    if(localData&&localData.passwordHash){
-      // Existing local user trying to login
-      if(localData.passwordHash!==h){document.getElementById('lerr').style.display='block';localStorage.removeItem('budgr_userkey');return;}
-      S={...S,...localData};
-      if(!S.categories||!S.categories.length)S.categories=DEF_CATS;
-      if(!S.periods)S.periods=[];
-    } else {
-      // Brand new user with no data yet — check against stored passwordHash
-      if(S.passwordHash&&S.passwordHash!==h){document.getElementById('lerr').style.display='block';localStorage.removeItem('budgr_userkey');return;}
-    }
+  // Load this user's data from Sheet
+  await loadUserData();
+  document.getElementById('loader').style.display='none';
+
+  // Check password
+  if(S.passwordHash&&S.passwordHash!==h){
+    // Wrong password
+    document.getElementById('lerr').style.display='block';
+    localStorage.removeItem('budgr_userkey');
+    // Reset S to blank
+    S={periods:[],categories:DEF_CATS,subscriptions:[],transactions:[],streak:0,passwordHash:'',lastSync:null};
+    return;
   }
 
+  if(!S.passwordHash){
+    // New user slot — no password set yet, show setup
+    document.getElementById('loader').style.display='none';
+    document.getElementById('lerr').style.display='none';
+    openModal('msetup');
+    return;
+  }
+
+  // Correct password
   document.getElementById('lerr').style.display='none';
   document.getElementById('ls').style.display='none';
   document.getElementById('ma').classList.add('visible');
@@ -596,7 +601,27 @@ async function doLogin(){
 }
 document.getElementById('lpwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 function doLogout(){clearSession();localStorage.removeItem('budgr_userkey');document.getElementById('ma').classList.remove('visible');document.getElementById('ls').style.display='flex';document.getElementById('lpwd').value='';}
-async function saveSetup(){const p1=document.getElementById('sp1').value,p2=document.getElementById('sp2').value,err=document.getElementById('sperr');if(!p1){err.textContent='Cannot be empty';err.style.display='block';return}if(p1!==p2){err.textContent='Passwords do not match';err.style.display='block';return}S.passwordHash=await hashPwd(p1);await save();closeModal('msetup');err.style.display='none';toast('Password set!')}
+async function saveSetup(){
+  const p1=document.getElementById('sp1').value,p2=document.getElementById('sp2').value,err=document.getElementById('sperr');
+  if(!p1){err.textContent='Cannot be empty';err.style.display='block';return}
+  if(p1!==p2){err.textContent='Passwords do not match';err.style.display='block';return}
+  const h=await hashPwd(p1);
+  // Set userkey based on this new password
+  const userkey='user_'+h.slice(0,16);
+  localStorage.setItem('budgr_userkey',userkey);
+  S.passwordHash=h;
+  S.categories=S.categories&&S.categories.length?S.categories:DEF_CATS;
+  S.periods=S.periods||[];
+  await save();
+  closeModal('msetup');
+  err.style.display='none';
+  toast('Password set!');
+  // Auto login after setup
+  document.getElementById('ls').style.display='none';
+  document.getElementById('ma').classList.add('visible');
+  setSession();
+  renderAll();
+}
 async function changePwd(){const c=document.getElementById('pc').value,n1=document.getElementById('pn').value,n2=document.getElementById('pcf').value,err=document.getElementById('pe2');if(await hashPwd(c)!==S.passwordHash){err.textContent='Current password incorrect';err.style.display='block';return}if(!n1){err.textContent='New password empty';err.style.display='block';return}if(n1!==n2){err.textContent='Passwords do not match';err.style.display='block';return}S.passwordHash=await hashPwd(n1);await save();closeModal('mpwd');toast('Password updated!')}
 
 // ═══ CONFIRM ═══
