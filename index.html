@@ -470,8 +470,26 @@ let rTab='overview',txF='all',rChart=null,rFType=null,rFCat=null,cCatId=null;
 async function hashPwd(p){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
 
 // ═══ STORAGE ═══
-async function syncSheet(d){try{const r=await fetch(SHEET_URL+'?action=save&data='+encodeURIComponent(JSON.stringify(d)),{redirect:'follow'});return(await r.json()).success}catch{return false}}
-async function fetchSheet(){try{const r=await fetch(SHEET_URL+'?action=load',{redirect:'follow'});const j=await r.json();return j.data?JSON.parse(j.data):null}catch{return null}}
+function getUserKey(){
+  // Use first 16 chars of password hash as user key (set after login)
+  return localStorage.getItem('budgr_userkey')||'budgr_main';
+}
+
+async function syncSheet(d){
+  try{
+    const key=getUserKey();
+    const r=await fetch(SHEET_URL+'?action=save&key='+encodeURIComponent(key)+'&data='+encodeURIComponent(JSON.stringify(d)),{redirect:'follow'});
+    return(await r.json()).success;
+  }catch{return false}
+}
+async function fetchSheet(){
+  try{
+    const key=getUserKey();
+    const r=await fetch(SHEET_URL+'?action=load&key='+encodeURIComponent(key),{redirect:'follow'});
+    const j=await r.json();
+    return j.data?JSON.parse(j.data):null;
+  }catch{return null}
+}
 async function save(){
   localStorage.setItem('budgr',JSON.stringify(S));
   const ok=await syncSheet(S);
@@ -531,9 +549,53 @@ function clearSession(){
 }
 
 // ═══ AUTH ═══
-async function doLogin(){const h=await hashPwd(document.getElementById('lpwd').value);if(h===S.passwordHash){document.getElementById('lerr').style.display='none';document.getElementById('ls').style.display='none';document.getElementById('ma').classList.add('visible');setSession();renderAll();}else document.getElementById('lerr').style.display='block';}
+async function doLogin(){
+  const pwd=document.getElementById('lpwd').value;
+  const h=await hashPwd(pwd);
+
+  // Multi-user: try loading data for this user from Sheet first
+  // userkey = first 16 chars of password hash
+  const userkey='user_'+h.slice(0,16);
+  localStorage.setItem('budgr_userkey', userkey);
+
+  // Try fetching this user's data
+  let userData = await fetchSheet();
+
+  if(userData&&!userData.__reset&&Object.keys(userData).length>1){
+    // Found existing user data — check password matches
+    if(userData.passwordHash && userData.passwordHash !== h){
+      // Wrong password for this user slot (hash collision edge case, extremely rare)
+      document.getElementById('lerr').style.display='block';
+      localStorage.removeItem('budgr_userkey');
+      return;
+    }
+    // Valid existing user
+    S={...S,...userData};
+    if(!S.categories||!S.categories.length)S.categories=DEF_CATS;
+    if(!S.periods)S.periods=[];
+  } else if(!userData||userData.__reset||Object.keys(userData||{}).length<=1){
+    // New user — check if they have a local password set
+    const localData=loadLocal();
+    if(localData&&localData.passwordHash){
+      // Existing local user trying to login
+      if(localData.passwordHash!==h){document.getElementById('lerr').style.display='block';localStorage.removeItem('budgr_userkey');return;}
+      S={...S,...localData};
+      if(!S.categories||!S.categories.length)S.categories=DEF_CATS;
+      if(!S.periods)S.periods=[];
+    } else {
+      // Brand new user with no data yet — check against stored passwordHash
+      if(S.passwordHash&&S.passwordHash!==h){document.getElementById('lerr').style.display='block';localStorage.removeItem('budgr_userkey');return;}
+    }
+  }
+
+  document.getElementById('lerr').style.display='none';
+  document.getElementById('ls').style.display='none';
+  document.getElementById('ma').classList.add('visible');
+  setSession();
+  renderAll();
+}
 document.getElementById('lpwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
-function doLogout(){clearSession();document.getElementById('ma').classList.remove('visible');document.getElementById('ls').style.display='flex';document.getElementById('lpwd').value='';}
+function doLogout(){clearSession();localStorage.removeItem('budgr_userkey');document.getElementById('ma').classList.remove('visible');document.getElementById('ls').style.display='flex';document.getElementById('lpwd').value='';}
 async function saveSetup(){const p1=document.getElementById('sp1').value,p2=document.getElementById('sp2').value,err=document.getElementById('sperr');if(!p1){err.textContent='Cannot be empty';err.style.display='block';return}if(p1!==p2){err.textContent='Passwords do not match';err.style.display='block';return}S.passwordHash=await hashPwd(p1);await save();closeModal('msetup');err.style.display='none';toast('Password set!')}
 async function changePwd(){const c=document.getElementById('pc').value,n1=document.getElementById('pn').value,n2=document.getElementById('pcf').value,err=document.getElementById('pe2');if(await hashPwd(c)!==S.passwordHash){err.textContent='Current password incorrect';err.style.display='block';return}if(!n1){err.textContent='New password empty';err.style.display='block';return}if(n1!==n2){err.textContent='Passwords do not match';err.style.display='block';return}S.passwordHash=await hashPwd(n1);await save();closeModal('mpwd');toast('Password updated!')}
 
@@ -1117,7 +1179,7 @@ function openForecast(){
 
 // ═══ SYNC / RESET ═══
 async function syncNow(){toast('Syncing...');const ok=await syncSheet(S);if(ok){S.lastSync=new Date().toISOString();localStorage.setItem('budgr',JSON.stringify(S));document.getElementById('lsl').textContent=fmtSync(S.lastSync);toast('✅ Synced!');}else toast('❌ Sync failed');}
-function askReset(){askConfirm('Reset all data?','Permanently deletes ALL data. Cannot be undone.',async()=>{localStorage.removeItem('budgr');try{await fetch(SHEET_URL+'?action=save&data='+encodeURIComponent(JSON.stringify({__reset:true})),{redirect:'follow'});}catch{}location.reload();});}
+function askReset(){askConfirm('Reset all data?','Permanently deletes ALL data. Cannot be undone.',async()=>{localStorage.removeItem('budgr');try{await syncSheet({__reset:true});}catch{}clearSession();localStorage.removeItem('budgr_userkey');location.reload();});}
 
 // ═══ CONFETTI ═══
 function confetti(){const c=document.getElementById('ccanvas');c.style.display='block';const x=c.getContext('2d');c.width=window.innerWidth;c.height=window.innerHeight;const ps=Array.from({length:80},()=>({x:Math.random()*c.width,y:Math.random()*-c.height,r:Math.random()*6+2,d:Math.random()*80+10,col:['#7c6af7','#f7c86a','#6af7b8','#f76a6a','#fff'][Math.floor(Math.random()*5)],t:Math.random()*10-10,ti:Math.random()*.07+.05}));let a=0,f=0;function draw(){x.clearRect(0,0,c.width,c.height);a+=.01;ps.forEach(p=>{x.beginPath();x.fillStyle=p.col;x.ellipse(p.x,p.y,p.r,p.r*.4,p.t,0,Math.PI*2);x.fill();p.y+=Math.cos(a+p.d)+2;p.x+=Math.sin(a)*1.5;p.t+=p.ti;});f++;if(f<120)requestAnimationFrame(draw);else{x.clearRect(0,0,c.width,c.height);c.style.display='none';}}draw();}
