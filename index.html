@@ -715,7 +715,10 @@ function todaySpent(){const t=todayStr();return(S.transactions||[]).filter(x=>x.
 // Get base daily budget for a given date within a period
 // Uses recalcHistory if available, otherwise baseDailyBudget
 function getBaseForDate(p, dateStr) {
-  const base = p.baseDailyBudget || netBudget(p) / Math.max(1, daysInPeriod(p));
+  // Always recalculate base from current subs (don't trust cached baseDailyBudget)
+  const days = Math.max(1, Math.round((parseLD(p.end)-parseLD(p.start))/864e5)+1);
+  const subs = subsPeriod(p);
+  const base = ((parseFloat(p.budget)||0) - subs) / days;
   const history = p.recalcHistory || [];
   // Find most recent recalc on or before this date
   const applicable = history.filter(r => r.date <= dateStr).sort((a,b) => b.date.localeCompare(a.date));
