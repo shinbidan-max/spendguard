@@ -679,7 +679,7 @@ function fmtDate(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.get
 function fmtShort(d){return d.toLocaleString('en',{day:'numeric',month:'short'})}
 function fmtMonth(d){return d.toLocaleString('en',{month:'long',year:'numeric'})}
 function fmtSync(iso){if(!iso)return'Never';const d=new Date(iso);return d.toLocaleString('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
-function fmtN(n){return parseFloat(n||0).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:2})}
+function fmtN(n){return parseFloat(n||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}
 
 // ═══ PERIOD HELPERS ═══
 function sortedPeriods(){return[...(S.periods||[])].sort((a,b)=>a.start.localeCompare(b.start))}
