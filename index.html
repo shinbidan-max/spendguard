@@ -478,7 +478,8 @@ function getUserKey(){
 async function syncSheet(d){
   try{
     const key=getUserKey();
-    const r=await fetch(SHEET_URL+'?action=save&key='+encodeURIComponent(key)+'&data='+encodeURIComponent(JSON.stringify(d)),{redirect:'follow'});
+    const body=JSON.stringify({action:'save',key,data:JSON.stringify(d)});
+    const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'application/json'},body,redirect:'follow'});
     return(await r.json()).success;
   }catch{return false}
 }
