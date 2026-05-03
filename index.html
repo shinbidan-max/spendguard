@@ -478,10 +478,8 @@ function getUserKey(){
 async function syncSheet(d){
   try{
     const key=getUserKey();
-    // Use GET with chunked approach - Apps Script doesn't support CORS POST
-    const data=JSON.stringify(d);
-    const encoded=btoa(unescape(encodeURIComponent(data)));
-    const url=SHEET_URL+'?action=save&key='+encodeURIComponent(key)+'&data='+encodeURIComponent(encoded)+'&enc=1';
+    const data=encodeURIComponent(JSON.stringify(d));
+    const url=SHEET_URL+'?action=save&key='+encodeURIComponent(key)+'&data='+data;
     const r=await fetch(url,{redirect:'follow'});
     return(await r.json()).success;
   }catch{return false}
