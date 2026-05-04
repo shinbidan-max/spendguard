@@ -619,6 +619,8 @@ async function init(){
     await loadUserData();
     document.getElementById('ls').style.display='none';
     document.getElementById('ma').classList.add('visible');
+    familyMonth=currentYM();
+    await loadFamily();
     renderAll();
   } else {
     // No session — show login
