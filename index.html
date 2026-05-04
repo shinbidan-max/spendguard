@@ -1860,7 +1860,7 @@ async function renderFamily(){
 
 function renderFamilySummary(){
   const ym=familyMonth;
-  const rev=famRevTotal(ym),exp=famExpTotal(ym),sav=rev-exp;
+  const rev=famRevTotal(ym),exp=famExpTotal(ym),sav=famSavings(ym);
   // Annual cost: show total budget vs total spent this year
   const year=ymYear(ym);
   const annBudget=(FS.annualCost||[]).reduce((s,a)=>s+(parseFloat(a.budget)||0),0);
