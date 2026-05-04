@@ -1177,8 +1177,8 @@ function renderCompare(con){
   <div id="compd"></div>`;
   cCatId=null;window._cType='both';setTimeout(drawCompare,50);
 }
-function setCType(el){document.querySelectorAll('#ctc .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');window._cType=el.dataset.ct;cCatId=null;document.querySelectorAll('#ccc .chip').forEach(c=>c.classList.remove('active'));document.querySelector('#ccc .chip').classList.add('active');drawCompare();}
-function setCCat(el,id){document.querySelectorAll('#ccc .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');cCatId=id;if(id){window._cType=null;document.querySelectorAll('#ctc .chip').forEach(c=>c.classList.remove('active'));}drawCompare();}
+function setCType(el){document.querySelectorAll('#ctc .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');window._cType=el.dataset.ct;cCatId=null;document.querySelectorAll('#ccc .chip').forEach(c=>c.classList.remove('active'));document.querySelector('#ccc .chip').classList.add('active');document.getElementById('compd').innerHTML='';drawCompare();}
+function setCCat(el,id){document.querySelectorAll('#ccc .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');cCatId=id;if(id){window._cType=null;document.querySelectorAll('#ctc .chip').forEach(c=>c.classList.remove('active'));}document.getElementById('compd').innerHTML='';drawCompare();}
 function drawCompare(){
   const allSorted=sortedPeriods();const apIdx=allSorted.findIndex(p=>p.id===getActive()?.id);const end=apIdx>=0?apIdx:allSorted.length-1;const start=Math.max(0,end-5);const realPeriods=allSorted.slice(start,end+1);
   const slots=[];for(let i=0;i<6;i++){const ri=i-(5-(realPeriods.length-1));slots.push(ri>=0&&ri<realPeriods.length?realPeriods[ri]:null);}
