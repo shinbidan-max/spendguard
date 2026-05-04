@@ -883,10 +883,17 @@ function getTodayCarryover(p) {
   return budgetWithCarry - base; // = carry that came in from yesterday
 }
 
-// Check if recalculate already done today for this period
+// Check if recalculate done today OR yesterday
 function recalcDoneToday(p) {
   const t = todayStr();
-  return (p.recalcHistory||[]).some(r => r.date === t);
+  const yesterday = fmtDate(new Date(parseLD(t).getTime() - 864e5));
+  return (p.recalcHistory||[]).some(r => r.date === t || r.date === yesterday);
+}
+
+function recalcLastDate(p) {
+  const h = p.recalcHistory||[];
+  if(!h.length) return null;
+  return h[h.length-1].date;
 }
 
 // Ensure period has baseDailyBudget set
@@ -962,7 +969,13 @@ function renderHome(){
     const recalcBtn=document.getElementById('btn-recalc');
     const bottomRow=document.getElementById('daily-card-bottom');
     if(recalcBtn){
-      if(recalcDoneToday(p)){recalcBtn.textContent='✓ Recalculated today';recalcBtn.className='btn-recalc done';recalcBtn.disabled=true;}
+      if(recalcDoneToday(p)){
+        const last=recalcLastDate(p);
+        const t=todayStr();
+        const yesterday=fmtDate(new Date(parseLD(t).getTime()-864e5));
+        recalcBtn.textContent=last===t?'✓ Recalculated today':'✓ Recalculated yesterday';
+        recalcBtn.className='btn-recalc done';recalcBtn.disabled=true;
+      }
       else{recalcBtn.textContent='⟳ Recalculate';recalcBtn.className='btn-recalc';recalcBtn.disabled=false;}
       // Undo button
       const undoBtn=document.getElementById('btn-undo-recalc');
