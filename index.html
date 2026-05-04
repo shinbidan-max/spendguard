@@ -1186,85 +1186,104 @@ function drawCompare(){
   const labels=slots.map((p,i)=>p?periodName(p).split(' ')[0]:`P${i+1}`);const ctype=window._cType||'both';
   function sv(p,t){if(!p)return 0;if(t==='income')return pInc(p);if(t==='cat'){const sa=subsForPeriod(p).filter(s=>s.category===cCatId).reduce((s,x)=>s+parseFloat(x.amount),0);return pTxs(p).filter(t=>t.type==='expense'&&t.category===cCatId).reduce((s,t)=>s+t.amount,0)+sa;}return pExp(p)+subsPeriod(p);}
   let ds=[];
-  if(cCatId){const c=getCat(cCatId);ds=[{label:c?c.icon+' '+c.name:'Category',data:slots.map(p=>sv(p,'cat')),backgroundColor:slots.map(p=>p?'rgba(251,191,36,.8)':'rgba(251,191,36,.15)'),borderRadius:8,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(251,191,36,.4)':'transparent'),borderWidth:1}];}
-  else if(ctype==='both')ds=[{label:'Income',data:slots.map(p=>sv(p,'income')),backgroundColor:slots.map(p=>p?'rgba(45,212,191,.85)':'rgba(45,212,191,.12)'),borderRadius:8,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(45,212,191,.8)':'transparent'),borderWidth:1},{label:'Expense',data:slots.map(p=>sv(p,'expense')),backgroundColor:slots.map(p=>p?'rgba(248,113,113,.85)':'rgba(248,113,113,.12)'),borderRadius:8,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(248,113,113,.8)':'transparent'),borderWidth:1}];
-  else if(ctype==='income')ds=[{label:'Income',data:slots.map(p=>sv(p,'income')),backgroundColor:slots.map(p=>p?'rgba(45,212,191,.8)':'rgba(45,212,191,.15)'),borderRadius:8,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(45,212,191,.4)':'transparent'),borderWidth:1}];
-  else ds=[{label:'Expense',data:slots.map(p=>sv(p,'expense')),backgroundColor:slots.map(p=>p?'rgba(248,113,113,.85)':'rgba(248,113,113,.12)'),borderRadius:8,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(248,113,113,.8)':'transparent'),borderWidth:1}];
-  rChart=new Chart(ctx,{type:'bar',data:{labels,datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{
-  legend:{labels:{color:'#6d85a8',font:{size:11},usePointStyle:true,pointStyle:'circle',boxWidth:8}},
-  tooltip:{
-    backgroundColor:'rgba(12,21,36,.95)',
-    borderColor:'rgba(56,189,248,.3)',
-    borderWidth:1,
-    titleColor:'#e2eaf8',
-    bodyColor:'#6d85a8',
-    padding:10,
-    callbacks:{label:c=>` ฿${fmtN(c.parsed.y)}`}
-  }
-},scales:{
-  x:{
-    ticks:{color:'#6d85a8',font:{size:10}},
-    grid:{display:false},
-    border:{color:'rgba(56,189,248,.1)'}
-  },
-  y:{
-    ticks:{color:'#6d85a8',font:{size:10},callback:v=>'฿'+fmtN(v)},
-    grid:{color:'rgba(56,189,248,.1)',lineWidth:1},
-    border:{color:'rgba(56,189,248,.1)',dash:[4,4]}
-  }
-},onClick:(e,els)=>{if(!els.length){document.getElementById('compd').innerHTML='';return;}const idx=els[0].index;const clickedP=slots[idx];if(clickedP)renderComparePeriodDetail(clickedP);else document.getElementById('compd').innerHTML='<div class="empty"><div class="empty-sub">No data for this slot</div></div>';}}},[{
-  id:'barGlow',
-  afterDatasetsDraw(chart){
-    const{ctx}=chart;
-    chart.data.datasets.forEach((ds,di)=>{
-      const meta=chart.getDatasetMeta(di);
-      const glowCol=di===0?'rgba(45,212,191,.6)':'rgba(248,113,113,.6)';
-      ctx.save();ctx.shadowColor=glowCol;ctx.shadowBlur=14;
-      meta.data.forEach(bar=>bar.draw(ctx));
-      ctx.shadowBlur=0;ctx.restore();
-    });
-  }
-},{
-  id:'lightning',
-  afterDatasetsDraw(chart){
-    const{ctx}=chart;
-    const t=Date.now()/900;
-    chart.data.datasets.forEach((ds,di)=>{
-      const meta=chart.getDatasetMeta(di);
-      const col=di===0?'45,212,191':'248,113,113';
-      meta.data.forEach((bar,bi)=>{
-        if((ds.data[bi]||0)<=0)return;
-        const{x,y,base,width}=bar.getProps(['x','y','base','width']);
-        const h=base-y;if(h<14)return;
-        ctx.save();
-        ctx.beginPath();ctx.rect(x-width/2,y,width,h);ctx.clip();
-        for(let li=0;li<2;li++){
-          const phase=(t*0.7+bi*0.5+li*1.1)%1;
-          const topY=base-h*phase;
-          const segs=7;const segH=h*0.55/segs;
-          let px=x+(li===0?-width*0.12:width*0.12),py=topY;
-          ctx.beginPath();ctx.moveTo(px,py);
-          for(let s=0;s<segs;s++){
-            const nx=x+(Math.sin(t*2.5+s*1.9+bi*0.8+li*3)*width*0.22);
-            const ny=py-segH;
-            ctx.lineTo(nx,ny);px=nx;py=ny;
+  if(cCatId){const cat=getCat(cCatId);ds=[{label:cat?cat.icon+' '+cat.name:'Category',data:slots.map(p=>sv(p,'cat')),backgroundColor:slots.map(p=>p?'rgba(251,191,36,.25)':'rgba(251,191,36,.06)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(251,191,36,.6)':'transparent'),borderWidth:1}];}
+  else if(ctype==='both')ds=[
+    {label:'Income',data:slots.map(p=>sv(p,'income')),backgroundColor:slots.map(p=>p?'rgba(45,212,191,.2)':'rgba(45,212,191,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(45,212,191,.5)':'transparent'),borderWidth:1},
+    {label:'Expense',data:slots.map(p=>sv(p,'expense')),backgroundColor:slots.map(p=>p?'rgba(248,113,113,.2)':'rgba(248,113,113,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(248,113,113,.5)':'transparent'),borderWidth:1}
+  ];
+  else if(ctype==='income')ds=[{label:'Income',data:slots.map(p=>sv(p,'income')),backgroundColor:slots.map(p=>p?'rgba(45,212,191,.2)':'rgba(45,212,191,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(45,212,191,.5)':'transparent'),borderWidth:1}];
+  else ds=[{label:'Expense',data:slots.map(p=>sv(p,'expense')),backgroundColor:slots.map(p=>p?'rgba(248,113,113,.2)':'rgba(248,113,113,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(248,113,113,.5)':'transparent'),borderWidth:1}];
+
+  // Running border light plugin
+  const _borderLight={
+    id:'barBorderLight',
+    afterDatasetsDraw(chart){
+      if(chart.canvas.id!=='ccomp')return;
+      const{ctx}=chart;
+      const t=(Date.now()/1200)%1;
+      chart.data.datasets.forEach((ds,di)=>{
+        const meta=chart.getDatasetMeta(di);
+        const col=di===0?[45,212,191]:[248,113,113];
+        const glowCol=`rgba(${col[0]},${col[1]},${col[2]},.5)`;
+        // Glow pass on bar fill
+        ctx.save();ctx.shadowColor=glowCol;ctx.shadowBlur=14;
+        meta.data.forEach(bar=>bar.draw(ctx));
+        ctx.shadowBlur=0;ctx.restore();
+        // Running light on bar border
+        meta.data.forEach((bar,bi)=>{
+          if((chart.data.datasets[di].data[bi]||0)<=0)return;
+          const props=bar.getProps(['x','y','base','width']);
+          const bx=props.x,by=props.y,bb=props.base,bw=props.width;
+          const h=bb-by;if(h<8)return;
+          const r=6; // border radius
+          const x1=bx-bw/2,x2=bx+bw/2;
+          // Perimeter = 2*(bw+h) approx
+          const perimeter=2*(bw+h);
+          // offset per bar so they don't all sync
+          const phase=(t+bi*0.15+di*0.3)%1;
+          const pos=phase*perimeter;
+          // Draw glowing dot that travels the perimeter
+          // Perimeter segments: bottom, right, top, left
+          const segments=[
+            {len:bw, x:(d)=>x1+d, y:()=>bb},          // bottom L→R
+            {len:h,  x:()=>x2,    y:(d)=>bb-d},        // right bottom→top
+            {len:bw, x:(d)=>x2-d, y:()=>by},           // top R→L
+            {len:h,  x:()=>x1,    y:(d)=>by+d},        // left top→bottom
+          ];
+          let rem=pos, px2=x1, py2=bb;
+          for(const seg of segments){
+            if(rem<=seg.len){
+              px2=seg.x(rem);py2=seg.y(rem);break;
+            }
+            rem-=seg.len;
           }
-          const alpha=Math.sin(phase*Math.PI)*0.75+0.1;
-          ctx.strokeStyle='rgba('+col+','+alpha+')';
-          ctx.lineWidth=li===0?1.8:1.2;
-          ctx.shadowColor='rgba('+col+',0.9)';
-          ctx.shadowBlur=10;ctx.stroke();
-          ctx.beginPath();ctx.arc(px,py,2.5,0,Math.PI*2);
-          ctx.fillStyle='rgba('+col+','+(alpha+0.2)+')';
-          ctx.shadowBlur=14;ctx.fill();
-        }
-        ctx.restore();
+          // Draw glowing orb at position
+          ctx.save();
+          const grd=ctx.createRadialGradient(px2,py2,0,px2,py2,8);
+          grd.addColorStop(0,`rgba(${col[0]},${col[1]},${col[2]},0.95)`);
+          grd.addColorStop(0.4,`rgba(${col[0]},${col[1]},${col[2]},0.4)`);
+          grd.addColorStop(1,`rgba(${col[0]},${col[1]},${col[2]},0)`);
+          ctx.beginPath();ctx.arc(px2,py2,8,0,Math.PI*2);
+          ctx.fillStyle=grd;
+          ctx.shadowColor=`rgba(${col[0]},${col[1]},${col[2]},1)`;
+          ctx.shadowBlur=16;ctx.fill();
+          // Bright core
+          ctx.beginPath();ctx.arc(px2,py2,2.5,0,Math.PI*2);
+          ctx.fillStyle=`rgba(255,255,255,0.9)`;
+          ctx.shadowBlur=10;ctx.fill();
+          ctx.restore();
+        });
       });
-    });
-    chart._raf=requestAnimationFrame(()=>{try{chart.draw();}catch{}});
-  },
-  destroy(chart){if(chart._raf)cancelAnimationFrame(chart._raf);}
-}]);
+      chart._lightRAF=requestAnimationFrame(()=>{try{if(chart.canvas)chart.draw();}catch{}});
+    },
+    beforeDestroy(chart){if(chart._lightRAF)cancelAnimationFrame(chart._lightRAF);}
+  };
+  try{Chart.unregister(_borderLight);}catch{}
+  Chart.register(_borderLight);
+
+  rChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:ds},
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{color:'#6d85a8',font:{size:11},usePointStyle:true,pointStyle:'circle',boxWidth:8}},
+        tooltip:{backgroundColor:'rgba(12,21,36,.95)',borderColor:'rgba(56,189,248,.3)',borderWidth:1,titleColor:'#e2eaf8',bodyColor:'#6d85a8',padding:10,callbacks:{label:c=>` ฿${fmtN(c.parsed.y)}`}}
+      },
+      scales:{
+        x:{ticks:{color:'#6d85a8',font:{size:10}},grid:{display:false},border:{color:'rgba(56,189,248,.1)'}},
+        y:{ticks:{color:'#6d85a8',font:{size:10},callback:v=>'฿'+fmtN(v)},grid:{color:'rgba(56,189,248,.1)',lineWidth:1},border:{color:'rgba(56,189,248,.1)',dash:[4,4]}}
+      },
+      onClick:(e,els)=>{
+        if(!els.length){document.getElementById('compd').innerHTML='';return;}
+        const idx=els[0].index;
+        const clickedP=slots[idx];
+        if(clickedP)renderComparePeriodDetail(clickedP);
+        else document.getElementById('compd').innerHTML='<div class="empty"><div class="empty-sub">No data for this slot</div></div>';
+      }
+    }
+  });
 }
 function renderComparePeriodDetail(p){const el=document.getElementById('compd');if(!el)return;const cat=cCatId?getCat(cCatId):null;const ctype=window._cType;let txs,subs=[];if(cCatId){subs=subsForPeriod(p).filter(s=>s.category===cCatId);txs=pTxs(p).filter(t=>t.category===cCatId).sort((a,b)=>b.date.localeCompare(a.date));}else{const type=ctype==='income'?'income':'expense';subs=type==='expense'?subsForPeriod(p):[];txs=pTxs(p).filter(t=>t.type===type).sort((a,b)=>b.date.localeCompare(a.date));}el.innerHTML=`<div class="sh" style="margin-top:16px"><div class="stitle">${periodName(p)}${cat?' · '+cat.icon+' '+cat.name:''}</div></div>`+subs.map(subPinnedHTML).join('')+(txs.length?txs.map(txHTML).join(''):'<div class="empty"><div class="empty-sub">No transactions</div></div>');}
 
