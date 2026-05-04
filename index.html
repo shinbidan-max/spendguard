@@ -1653,8 +1653,9 @@ function openFamilySavings(){
   const savingsData = months.map(ym => {
     const rev = famRevTotal(ym);
     const exp = famExpTotal(ym);
-    if(rev===0&&exp===0) return null;
-    return rev - exp;
+    const ann = famAnnualMonthTotal(ym);
+    if(rev===0&&exp===0&&ann===0) return null;
+    return rev - exp - ann;
   });
 
   const labels = months.map(ym => {
@@ -1755,7 +1756,7 @@ function openFamilyTrend(mode, itemId){
   // Bar colors: green if good, red if bad
   const barColors = actuals.map((a,i) => {
     if(a===0) return 'rgba(52,77,107,.4)';
-    if(!budget) return 'rgba(56,189,248,.7)';
+    if(budget===0) return 'rgba(56,189,248,.7)';
     if(isRevenue) return a>=budget?'rgba(45,212,191,.8)':'rgba(251,191,36,.8)';
     return a<=budget?'rgba(45,212,191,.8)':'rgba(248,113,113,.8)';
   });
@@ -1880,6 +1881,10 @@ function renderFamilySummary(){
           <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase">Expense</div>
           <div style="font-family:'DM Mono',monospace;font-size:17px;font-weight:700;color:var(--danger)">฿${fmtN(expOnly)}</div>
         </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase">Annual Cost</div>
+          <div style="font-family:'DM Mono',monospace;font-size:17px;font-weight:700;color:var(--amber)">-฿${fmtN(annMonth)}</div>
+        </div>
         <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;cursor:pointer" onclick="openFamilySavings()">
           <div style="display:flex;align-items:center;gap:6px">
             <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase">Savings</div>
@@ -1891,11 +1896,7 @@ function renderFamilySummary(){
       <div style="border-top:1px solid rgba(56,189,248,.1);padding-top:12px">
         <div style="display:flex;align-items:center;justify-content:space-between">
           <div>
-            <div style="font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Annual Cost This Month ${annOver?'<span style="color:var(--danger)">⚠ Over Year</span>':''}</div>
-            <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--amber)">-฿${fmtN(annMonth)}</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Year Total</div>
+            <div style="font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Annual Cost Year Total ${annOver?'<span style="color:var(--danger)">⚠ Over</span>':''}</div>
             <div style="font-family:'DM Mono',monospace;font-size:13px;color:${annOver?'var(--danger)':'var(--text2)'}">฿${fmtN(annSpent)} / ฿${fmtN(annBudget)}</div>
           </div>
         </div>
@@ -1911,7 +1912,7 @@ function renderFamilyChart(){
   if(familyChart){familyChart.destroy();familyChart=null;}
   const revData=months.map(m=>famRevTotal(m));
   const expData=months.map(m=>famExpTotal(m));
-  const savData=months.map(m=>famSavings(m));
+  const savData=months.map(m=>famSavings(m)); // famSavings = rev - exp - annual
   const labels=months.map(m=>{const[y,mo]=m.split('-');return new Date(parseInt(y),parseInt(mo)-1,1).toLocaleString('en',{month:'short'});});
 
   familyChart=new Chart(ctx,{
@@ -1921,7 +1922,7 @@ function renderFamilyChart(){
       datasets:[
         {label:'Revenue',data:revData,backgroundColor:'rgba(45,212,191,.7)',borderColor:'rgba(45,212,191,.9)',borderWidth:1,borderRadius:6,borderSkipped:false},
         {label:'Expense',data:expData,backgroundColor:'rgba(248,113,113,.7)',borderColor:'rgba(248,113,113,.9)',borderWidth:1,borderRadius:6,borderSkipped:false},
-        {label:'Savings',data:savData,backgroundColor:savData.map(v=>v>=0?'rgba(56,189,248,.5)':'rgba(251,191,36,.5)'),borderColor:savData.map(v=>v>=0?'rgba(56,189,248,.8)':'rgba(251,191,36,.8)'),borderWidth:1,borderRadius:6,borderSkipped:false,type:'bar'}
+        {label:'Savings',data:savData,backgroundColor:savData.map(v=>v>=0?'rgba(45,212,191,.6)':'rgba(248,113,113,.6)'),borderColor:savData.map(v=>v>=0?'rgba(45,212,191,.9)':'rgba(248,113,113,.9)'),borderWidth:1,borderRadius:6,borderSkipped:false,type:'bar'}
       ]
     },
     options:{
@@ -1945,9 +1946,18 @@ function renderFamilyDetail(){
   const year=ymYear(ym);
 
   function diffBadge(actual,budget,isRevenue){
-    if(!budget||actual===0)return'';
+    if(actual===0)return'';
+    if(budget===0){
+      // No plan set — any actual amount is "over"
+      if(isRevenue){
+        // Revenue with no plan: show as positive (above plan)
+        return`<span style="color:var(--teal);font-size:11px;font-family:'DM Mono',monospace">+฿${fmtN(actual)} <span style="opacity:.7">over plan</span></span>`;
+      } else {
+        // Expense/annual with no plan: show as over budget (red)
+        return`<span style="color:var(--danger);font-size:11px;font-family:'DM Mono',monospace">+฿${fmtN(actual)} <span style="opacity:.7">over plan</span></span>`;
+      }
+    }
     const diff=actual-budget;
-    const pct=Math.abs(diff/budget*100).toFixed(0);
     if(diff===0)return'';
     // Revenue: over budget = good (green), under = warn (amber)
     // Expense: over budget = bad (red), under = good (green)
@@ -2036,7 +2046,7 @@ function renderFamilyDetail(){
         ${items.map(item=>{
           const spent=famAnnualSpentYear(item,year);
           const budget=parseFloat(item.budget)||0;
-          const over=budget>0&&spent>budget;
+          const over=spent>budget;
           const pct=budget>0?Math.min(100,spent/budget*100):0;
           const thisMonth=famVal((item.monthlyData||{})[ym]);
           const hasThis=ym in (item.monthlyData||{})&&famVal((item.monthlyData||{})[ym])>0;
@@ -2054,7 +2064,7 @@ function renderFamilyDetail(){
               <button class="btn btn-sm btn-primary" style="padding:4px 10px" onclick="openFamilyVal('annual','${item.id}','${ym}')">+ Add</button>
             </div>
             ${famTxListHTML(item,ym,'annual')}
-            <div class="bprog" style="height:4px"><div class="${over?'bpb d':pct>=70?'bpb w':'bpb'}" style="width:${pct}%"></div></div>
+            <div class="bprog" style="height:4px"><div class="${over?'bpb d':pct>=70?'bpb w':'bpb'}" style="width:${budget>0?pct:spent>0?100:0}%"></div></div>
           </div>`;
         }).join('')}
       </div>
