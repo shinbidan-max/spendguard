@@ -513,6 +513,30 @@ html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-seri
   <div class="row"><button class="btn btn-secondary" onclick="closeModal('mfamily-val')">Cancel</button><button class="btn btn-primary" onclick="saveFamilyVal()">Save</button></div>
 </div></div>
 
+<!-- Family Trend Modal -->
+<div class="modal-backdrop" id="mfamily-trend"><div class="modal">
+  <div class="mh"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <div class="mt" id="ft-title">Trend</div>
+    <button class="btn btn-sm btn-secondary" style="padding:4px 10px" onclick="closeModal('mfamily-trend')">✕</button>
+  </div>
+  <div style="font-size:11px;color:var(--text3);margin-bottom:16px" id="ft-sub">—</div>
+  <div style="height:180px;margin-bottom:16px"><canvas id="ft-chart"></canvas></div>
+  <div id="ft-table"></div>
+</div></div>
+
+<!-- Family Yearly Savings Modal -->
+<div class="modal-backdrop" id="mfamily-savings"><div class="modal">
+  <div class="mh"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <div class="mt" id="fs-title">Yearly Savings</div>
+    <button class="btn btn-sm btn-secondary" style="padding:4px 10px" onclick="closeModal('mfamily-savings')">✕</button>
+  </div>
+  <div style="font-size:11px;color:var(--text3);margin-bottom:16px" id="fs-sub">—</div>
+  <div style="height:160px;margin-bottom:16px"><canvas id="fs-chart"></canvas></div>
+  <div id="fs-table"></div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 <canvas id="ccanvas"></canvas>
 
@@ -1526,6 +1550,7 @@ let _fiEditId = null;
 let _fvMode = ''; // section
 let _fvItemId = null;
 let _fvMonth = ''; // for monthly, or year for annual
+let _fvEditTxId = null;
 
 const FAMILY_KEY = 'family_shared';
 
@@ -1571,7 +1596,12 @@ function last6Months(ym){
 }
 
 // ── Calculations ──
-function famVal(v){if(!v)return 0;return typeof v==='object'?parseFloat(v.amount)||0:parseFloat(v)||0;}
+function famVal(v){
+  if(!v)return 0;
+  if(Array.isArray(v))return v.reduce((s,x)=>s+(parseFloat(x.amount)||0),0);
+  if(typeof v==='object')return parseFloat(v.amount)||0;
+  return parseFloat(v)||0;
+}
 function famRevTotal(ym){return(FS.revenue||[]).reduce((s,r)=>s+famVal((r.monthlyData||{})[ym]),0);}
 function famExpTotal(ym){return(FS.expense||[]).reduce((s,r)=>s+famVal((r.monthlyData||{})[ym]),0);}
 function famAnnualSpentYear(item,year){
@@ -1584,6 +1614,226 @@ function famAnnualSpentYear(item,year){
 }
 function famAnnualMonthTotal(ym){return(FS.annualCost||[]).reduce((s,a)=>s+famVal((a.monthlyData||{})[ym]),0);}
 function famSavings(ym){return famRevTotal(ym)-famExpTotal(ym)-famAnnualMonthTotal(ym);}
+
+
+function famTxListHTML(item, ym, mode){
+  const existing=(item.monthlyData||{})[ym];
+  const txList=Array.isArray(existing)?existing:existing?[{id:'legacy',amount:famVal(existing),note:typeof existing==='object'?existing.note:'',date:ym+'-01'}]:[];
+  const total=txList.reduce((s,x)=>s+(parseFloat(x.amount)||0),0);
+  if(!txList.length)return'';
+  return`<div style="margin-top:6px;border-top:1px solid rgba(255,255,255,.06);padding-top:6px">
+    ${txList.map(tx=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+      <div>
+        <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)">฿${fmtN(tx.amount)}</span>
+        ${tx.note?`<span style="font-size:11px;color:var(--text3);margin-left:6px">${esc(tx.note)}</span>`:''}
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-sm btn-secondary" style="padding:2px 8px;font-size:10px" onclick="openFamilyVal('${mode}','${item.id}','${ym}','${tx.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:10px" onclick="delFamilyTx('${mode}','${item.id}','${ym}','${tx.id}')">Del</button>
+      </div>
+    </div>`).join('')}
+    <div style="font-size:10px;color:var(--text3);text-align:right;margin-top:2px;font-family:'DM Mono',monospace">Total: ฿${fmtN(total)}</div>
+  </div>`;
+}
+
+
+// ── Family Yearly Savings ──
+let _fsChart = null;
+
+function openFamilySavings(){
+  const year = ymYear(familyMonth);
+  const months = [];
+  for(let m=1;m<=12;m++) months.push(year+'-'+pad(m));
+  const today = todayStr();
+  const currentYM2 = today.slice(0,7);
+
+  document.getElementById('fs-title').textContent = 'Savings ' + year;
+  document.getElementById('fs-sub').textContent = 'Monthly savings = Revenue − Expense';
+
+  const savingsData = months.map(ym => {
+    const rev = famRevTotal(ym);
+    const exp = famExpTotal(ym);
+    if(rev===0&&exp===0) return null;
+    return rev - exp;
+  });
+
+  const labels = months.map(ym => {
+    const[y,m]=ym.split('-');
+    return new Date(parseInt(y),parseInt(m)-1,1).toLocaleString('en',{month:'short'});
+  });
+
+  const total = savingsData.reduce((s,v)=>s+(v||0),0);
+
+  // Destroy old chart
+  if(_fsChart){_fsChart.destroy();_fsChart=null;}
+
+  const ctx = document.getElementById('fs-chart');
+  _fsChart = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label:'Savings',
+        data:savingsData.map(v=>v===null?0:v),
+        backgroundColor:savingsData.map(v=>v===null?'rgba(52,77,107,.3)':v>=0?'rgba(45,212,191,.75)':'rgba(248,113,113,.75)'),
+        borderColor:savingsData.map(v=>v===null?'transparent':v>=0?'rgba(45,212,191,.9)':'rgba(248,113,113,.9)'),
+        borderWidth:1,
+        borderRadius:6,
+        borderSkipped:false
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'rgba(12,21,36,.95)',borderColor:'rgba(56,189,248,.3)',borderWidth:1,titleColor:'#e2eaf8',bodyColor:'#6d85a8',padding:10,callbacks:{label:c=>' ฿'+fmtN(c.parsed.y)}}
+      },
+      scales:{
+        x:{ticks:{color:'#6d85a8',font:{size:10}},grid:{display:false}},
+        y:{ticks:{color:'#6d85a8',font:{size:10},callback:v=>'฿'+fmtN(v)},grid:{color:'rgba(56,189,248,.08)'}}
+      }
+    }
+  });
+
+  // Table
+  const tableHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 8px;border-bottom:2px solid rgba(56,189,248,.15);margin-bottom:4px">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase">Month</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase">Savings</div>
+    </div>
+    ${months.map((ym,i)=>{
+      const v=savingsData[i];
+      const[y,m]=ym.split('-');
+      const label=new Date(parseInt(y),parseInt(m)-1,1).toLocaleString('en',{month:'long'});
+      const isFuture=ym>currentYM2;
+      const color=v===null?'var(--text3)':v>=0?'var(--teal)':'var(--danger)';
+      return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+        <div style="font-size:13px;color:${isFuture?'var(--text3)':'var(--text2)'}">${label}${isFuture?' <span style="font-size:10px;opacity:.5">future</span>':''}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:${color}">
+          ${v===null?'—':((v>=0?'+':'')+' ฿'+fmtN(v))}
+        </div>
+      </div>`;
+    }).join('')}
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 4px;border-top:2px solid rgba(56,189,248,.15);margin-top:4px">
+      <div style="font-size:13px;font-weight:700;color:var(--text)">Total ${year}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:${total>=0?'var(--teal)':'var(--danger)'}">
+        ${total>=0?'+':''} ฿${fmtN(total)}
+      </div>
+    </div>`;
+
+  document.getElementById('fs-table').innerHTML = tableHTML;
+  openModal('mfamily-savings');
+}
+
+// ── Family Trend ──
+let _ftChart = null;
+
+function openFamilyTrend(mode, itemId){
+  const section = mode==='annual'?'annualCost':mode;
+  const item = (FS[section]||[]).find(x=>x.id===itemId);
+  if(!item) return;
+
+  const isRevenue = mode==='revenue';
+  const isAnnual = mode==='annual';
+  const budget = parseFloat(item.budget)||0;
+
+  // Get 6 months ending at familyMonth
+  const months = last6Months(familyMonth);
+
+  document.getElementById('ft-title').textContent = esc(item.name);
+  document.getElementById('ft-sub').textContent = isAnnual
+    ? `Annual budget ฿${fmtN(budget)}`
+    : `Plan ฿${fmtN(budget)}/mo`;
+
+  // Build data
+  const actuals = months.map(ym => famVal((item.monthlyData||{})[ym]));
+  const labels = months.map(ym => {
+    const[y,m]=ym.split('-');
+    return new Date(parseInt(y),parseInt(m)-1,1).toLocaleString('en',{month:'short'});
+  });
+
+  // Bar colors: green if good, red if bad
+  const barColors = actuals.map((a,i) => {
+    if(a===0) return 'rgba(52,77,107,.4)';
+    if(!budget) return 'rgba(56,189,248,.7)';
+    if(isRevenue) return a>=budget?'rgba(45,212,191,.8)':'rgba(251,191,36,.8)';
+    return a<=budget?'rgba(45,212,191,.8)':'rgba(248,113,113,.8)';
+  });
+  const borderColors = barColors.map(col=>col.replace(/[\d.]+\)$/,'1)'));
+
+  // Destroy old chart
+  if(_ftChart){_ftChart.destroy();_ftChart=null;}
+
+  const ctx = document.getElementById('ft-chart');
+  const datasets = [{
+    label:'Actual',
+    data:actuals,
+    backgroundColor:barColors,
+    borderColor:borderColors,
+    borderWidth:1,
+    borderRadius:6,
+    borderSkipped:false
+  }];
+
+  // Add plan reference line if budget set
+  if(budget>0){
+    datasets.push({
+      label:'Plan',
+      data:months.map(()=>budget),
+      type:'line',
+      borderColor:'rgba(56,189,248,.5)',
+      borderWidth:1.5,
+      borderDash:[4,3],
+      pointRadius:0,
+      fill:false,
+      tension:0
+    });
+  }
+
+  _ftChart = new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{color:'#6d85a8',font:{size:10},usePointStyle:true,pointStyle:'circle',boxWidth:8}},
+        tooltip:{backgroundColor:'rgba(12,21,36,.95)',borderColor:'rgba(56,189,248,.3)',borderWidth:1,titleColor:'#e2eaf8',bodyColor:'#6d85a8',padding:10,callbacks:{label:c=>' ฿'+fmtN(c.parsed.y)}}
+      },
+      scales:{
+        x:{ticks:{color:'#6d85a8',font:{size:10}},grid:{display:false}},
+        y:{ticks:{color:'#6d85a8',font:{size:10},callback:v=>'฿'+fmtN(v)},grid:{color:'rgba(56,189,248,.08)'}}
+      }
+    }
+  });
+
+  // Build table
+  const tableHTML = months.map((ym,i) => {
+    const a = actuals[i];
+    const[y,m]=ym.split('-');
+    const monthLabel=new Date(parseInt(y),parseInt(m)-1,1).toLocaleString('en',{month:'long',year:'numeric'});
+    let diffHTML='';
+    if(a===0){
+      diffHTML='<span style="color:var(--text3);font-size:11px">— no data</span>';
+    } else if(budget>0){
+      const diff=a-budget;
+      const isGood=isRevenue?diff>=0:diff<=0;
+      const sign=diff>0?'+':'';
+      diffHTML=diff===0
+        ?'<span style="color:var(--teal);font-size:11px">✓ on plan</span>'
+        :`<span style="color:${isGood?'var(--teal)':'var(--danger)'};font-size:11px;font-family:'DM Mono',monospace">${sign}฿${fmtN(Math.abs(diff))}</span><span style="font-size:10px;color:var(--text3);margin-left:3px">vs plan</span>`;
+    }
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+      <div style="font-size:13px;color:var(--text2)">${monthLabel}</div>
+      <div style="text-align:right">
+        <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:${a===0?'var(--text3)':'var(--text)'}">฿${fmtN(a)}</div>
+        ${diffHTML}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('ft-table').innerHTML = tableHTML;
+  openModal('mfamily-trend');
+}
 
 // ── Navigation ──
 function shiftFamilyMonth(dir){
@@ -1630,8 +1880,11 @@ function renderFamilySummary(){
           <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase">Expense</div>
           <div style="font-family:'DM Mono',monospace;font-size:17px;font-weight:700;color:var(--danger)">฿${fmtN(expOnly)}</div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.06);padding-top:10px">
-          <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase">Savings</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;cursor:pointer" onclick="openFamilySavings()">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase">Savings</div>
+            <span style="font-size:10px;color:var(--cyan);opacity:.6">↗</span>
+          </div>
           <div style="font-family:'DM Mono',monospace;font-size:17px;font-weight:700;color:${savColor}">${sav>=0?'+':''}฿${fmtN(sav)}</div>
         </div>
       </div>
@@ -1730,17 +1983,14 @@ function renderFamilyDetail(){
             <div style="display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="display:flex;align-items:center;gap:8px">
-                  <span style="font-size:14px;font-weight:600">${esc(item.name)}</span>
+                  <span style="font-size:14px;font-weight:600;cursor:pointer;color:var(--text)" onclick="openFamilyTrend('revenue','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
                   <button class="btn btn-sm btn-secondary" style="padding:2px 6px;font-size:10px" onclick="openFamilyItem('revenue','${item.id}')">Edit</button>
                 </div>
-                <div style="font-size:11px;color:var(--text3);margin-top:2px">Plan ฿${fmtN(budget)}/mo</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">Plan ฿${fmtN(budget)}/mo ${hasActual?diffBadge(actual,budget,true):''}</div>
               </div>
-              <div style="text-align:right">
-                <button class="btn btn-sm ${hasActual?'btn-secondary':'btn-primary'}" style="padding:4px 10px;margin-bottom:3px" onclick="openFamilyVal('revenue','${item.id}','${ym}')">${hasActual?'฿'+fmtN(actual):'+ Add'}</button>
-                ${hasActual&&typeof (item.monthlyData||{})[ym]==='object'&&((item.monthlyData||{})[ym]).note?`<div style="font-size:10px;color:var(--text3);margin-top:1px">${esc(((item.monthlyData||{})[ym]).note)}</div>`:''}
-                ${hasActual?diffBadge(actual,budget,true):''}
-              </div>
+              <button class="btn btn-sm btn-primary" style="padding:4px 10px" onclick="openFamilyVal('revenue','${item.id}','${ym}')">+ Add</button>
             </div>
+            ${famTxListHTML(item,ym,'revenue')}
           </div>`;
         }).join('')}
       </div>
@@ -1766,17 +2016,14 @@ function renderFamilyDetail(){
             <div style="display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="display:flex;align-items:center;gap:8px">
-                  <span style="font-size:14px;font-weight:600">${esc(item.name)}</span>
+                  <span style="font-size:14px;font-weight:600;cursor:pointer;color:var(--text)" onclick="openFamilyTrend('expense','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
                   <button class="btn btn-sm btn-secondary" style="padding:2px 6px;font-size:10px" onclick="openFamilyItem('expense','${item.id}')">Edit</button>
                 </div>
-                <div style="font-size:11px;color:var(--text3);margin-top:2px">Plan ฿${fmtN(budget)}/mo</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">Plan ฿${fmtN(budget)}/mo ${hasActual?diffBadge(actual,budget,false):''}</div>
               </div>
-              <div style="text-align:right">
-                <button class="btn btn-sm ${hasActual?'btn-secondary':'btn-primary'}" style="padding:4px 10px;margin-bottom:3px" onclick="openFamilyVal('expense','${item.id}','${ym}')">${hasActual?'฿'+fmtN(actual):'+ Add'}</button>
-                ${hasActual&&typeof (item.monthlyData||{})[ym]==='object'&&((item.monthlyData||{})[ym]).note?`<div style="font-size:10px;color:var(--text3);margin-top:1px">${esc(((item.monthlyData||{})[ym]).note)}</div>`:''}
-                ${hasActual?diffBadge(actual,budget,false):''}
-              </div>
+              <button class="btn btn-sm btn-primary" style="padding:4px 10px" onclick="openFamilyVal('expense','${item.id}','${ym}')">+ Add</button>
             </div>
+            ${famTxListHTML(item,ym,'expense')}
           </div>`;
         }).join('')}
       </div>
@@ -1797,17 +2044,16 @@ function renderFamilyDetail(){
             <div style="display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="display:flex;align-items:center;gap:8px">
-                  <span style="font-size:14px;font-weight:600">${esc(item.name)}</span>
+                  <span style="font-size:14px;font-weight:600;cursor:pointer;color:var(--text)" onclick="openFamilyTrend('annual','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
                   <button class="btn btn-sm btn-secondary" style="padding:2px 6px;font-size:10px" onclick="openFamilyItem('annual','${item.id}')">Edit</button>
                 </div>
                 <div style="font-size:11px;color:${over?'var(--danger)':'var(--text3)'};margin-top:2px">
                   ฿${fmtN(spent)} / ฿${fmtN(budget)} this year ${over?'⚠ Over':''}
                 </div>
               </div>
-              <div style="text-align:right">
-                <button class="btn btn-sm ${hasThis?'btn-secondary':'btn-primary'}" style="padding:4px 10px;margin-bottom:3px;${hasThis?'color:var(--danger)':''}" onclick="openFamilyVal('annual','${item.id}','${ym}')">${hasThis?'-฿'+fmtN(thisMonth):'+ Add'}</button>
-              </div>
+              <button class="btn btn-sm btn-primary" style="padding:4px 10px" onclick="openFamilyVal('annual','${item.id}','${ym}')">+ Add</button>
             </div>
+            ${famTxListHTML(item,ym,'annual')}
             <div class="bprog" style="height:4px"><div class="${over?'bpb d':pct>=70?'bpb w':'bpb'}" style="width:${pct}%"></div></div>
           </div>`;
         }).join('')}
@@ -1847,6 +2093,16 @@ async function saveFamilyItem(){
   await syncFamily();closeModal('mfamily-item');renderFamilyDetail();toast('Saved!');
 }
 
+async function delFamilyTx(mode,itemId,ym,txId){
+  const section=mode==='annual'?'annualCost':mode;
+  const i=(FS[section]||[]).findIndex(x=>x.id===itemId);
+  if(i<0)return;
+  const existing=FS[section][i].monthlyData[ym];
+  const txList=Array.isArray(existing)?existing:[];
+  FS[section][i].monthlyData[ym]=txList.filter(x=>x.id!==txId);
+  await syncFamily();renderFamilySummary();renderFamilyChart();renderFamilyDetail();toast('Deleted');
+}
+
 function delFamilyItem(mode,id){
   askConfirm('Delete this item?','All monthly data will be lost.',async()=>{
     const section=mode==='annual'?'annualCost':mode;
@@ -1856,35 +2112,50 @@ function delFamilyItem(mode,id){
 }
 
 // ── Edit monthly value ──
-function openFamilyVal(mode,itemId,ym){
-  _fvMode=mode;_fvItemId=itemId;_fvMonth=ym;
+function openFamilyVal(mode,itemId,ym,editTxId){
+  _fvMode=mode;_fvItemId=itemId;_fvMonth=ym;_fvEditTxId=editTxId||null;
   const section=mode==='annual'?'annualCost':mode;
   const item=(FS[section]||[]).find(x=>x.id===itemId);
-  const label=mode==='annual'?`${ymLabel(ym)} payment (฿)`:`Amount for ${ymLabel(ym)} (฿)`;
-  document.getElementById('fv-title').textContent=item?esc(item.name):'Edit Amount';
+  const label=mode==='annual'?'Payment amount (฿)':'Amount (฿)';
+  document.getElementById('fv-title').textContent=item?esc(item.name):'Add Transaction';
   document.getElementById('fv-label').textContent=label;
-  const existing=(item&&(item.monthlyData||{})[ym]);
-  const existAmt=existing?(typeof existing==='object'?existing.amount:existing):0;
-  const existNote=existing&&typeof existing==='object'?existing.note:'';
-  document.getElementById('fv-amount').value=existAmt||0;
-  document.getElementById('fv-note').value=existNote||'';
+  if(editTxId){
+    // Edit existing tx
+    const existing=(item&&(item.monthlyData||{})[ym]);
+    const txList=Array.isArray(existing)?existing:[];
+    const tx=txList.find(x=>x.id===editTxId);
+    document.getElementById('fv-amount').value=tx?tx.amount:0;
+    document.getElementById('fv-note').value=tx?tx.note:'';
+  } else {
+    document.getElementById('fv-amount').value='';
+    document.getElementById('fv-note').value='';
+  }
   openModal('mfamily-val');
   setTimeout(()=>document.getElementById('fv-amount').select(),200);
 }
 
 async function saveFamilyVal(){
   const val=parseFloat(document.getElementById('fv-amount').value)||0;
+  if(!val){toast('Enter an amount');return;}
+  const note=document.getElementById('fv-note').value.trim();
   const section=_fvMode==='annual'?'annualCost':_fvMode;
   const i=(FS[section]||[]).findIndex(x=>x.id===_fvItemId);
   if(i>-1){
     if(!FS[section][i].monthlyData)FS[section][i].monthlyData={};
-    const note=document.getElementById('fv-note').value.trim();
-    FS[section][i].monthlyData[_fvMonth]={amount:val,note};
+    const existing=FS[section][i].monthlyData[_fvMonth];
+    let txList=Array.isArray(existing)?[...existing]:existing?[{id:gid(),amount:famVal(existing),note:typeof existing==='object'?existing.note:'',date:_fvMonth+'-01'}]:[];
+    if(_fvEditTxId){
+      // Edit existing
+      const ti=txList.findIndex(x=>x.id===_fvEditTxId);
+      if(ti>-1){txList[ti].amount=val;txList[ti].note=note;}
+    } else {
+      // Add new
+      txList.push({id:gid(),amount:val,note,date:todayStr()});
+    }
+    FS[section][i].monthlyData[_fvMonth]=txList;
   }
   await syncFamily();closeModal('mfamily-val');
-  renderFamilySummary();
-  renderFamilyChart();
-  renderFamilyDetail();
+  renderFamilySummary();renderFamilyChart();renderFamilyDetail();
   toast('Saved!');
 }
 
