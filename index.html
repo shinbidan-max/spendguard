@@ -842,6 +842,8 @@ function fmtShort(d){return d.toLocaleString('en',{day:'numeric',month:'short'})
 function fmtMonth(d){return d.toLocaleString('en',{month:'long',year:'numeric'})}
 function fmtSync(iso){if(!iso)return'Never';const d=new Date(iso);return d.toLocaleString('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
 function fmtN(n){return parseFloat(n||0).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}
+let _cuRaf=null;
+function countUp(el,target,dur=750){if(_cuRaf)cancelAnimationFrame(_cuRaf);const from=parseFloat((el.textContent||'0').replace(/,/g,''))||0;const diff=target-from;if(Math.abs(diff)<0.01){el.textContent=fmtN(target);return;}const t0=performance.now();function tick(now){const p=Math.min((now-t0)/dur,1);const ease=1-Math.pow(1-p,3);el.textContent=fmtN(from+diff*ease);if(p<1)_cuRaf=requestAnimationFrame(tick);else el.textContent=fmtN(target);}  _cuRaf=requestAnimationFrame(tick);}
 
 // ═══ PERIOD HELPERS ═══
 function sortedPeriods(){return[...(S.periods||[])].sort((a,b)=>a.start.localeCompare(b.start))}
@@ -1007,7 +1009,7 @@ function renderHome(){
   const s=parseLD(p.start),e=parseLD(p.end);
   document.getElementById('hp').textContent=fmtShort(s)+' — '+fmtShort(e);
   document.getElementById('hm').textContent=periodName(p);
-  document.getElementById('hr').textContent=fmtN(Math.max(0,rem));
+  countUp(document.getElementById('hr'),Math.max(0,rem),750);
   document.getElementById('st').textContent=fmtN(parseFloat(p.budget)||0);
   document.getElementById('ssub').textContent=fmtN(subs);
   document.getElementById('ss').textContent=fmtN(exp);
