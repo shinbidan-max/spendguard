@@ -2056,7 +2056,7 @@ function renderFamilyDetail(){
                   ฿${fmtN(spent)} / ฿${fmtN(budget)} this year ${over?'⚠ Over':''}
                 </div>
               </div>
-              <button class="btn btn-sm btn-primary" style="padding:4px 10px" onclick="openFamilyVal('annual','${item.id}','${ym}')">+ Add</button>
+              <button class="btn btn-sm" style="padding:4px 10px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border-color:#f59e0b;box-shadow:0 4px 14px rgba(245,158,11,.3)" onclick="openFamilyVal('annual','${item.id}','${ym}')">+ Add</button>
             </div>
             ${famTxListHTML(item,ym,'annual')}
             <div class="bprog" style="height:4px"><div class="${over?'bpb d':pct>=70?'bpb w':'bpb'}" style="width:${budget>0?pct:spent>0?100:0}%"></div></div>
