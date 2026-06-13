@@ -143,8 +143,8 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .forecast-row:last-child{border-bottom:none}
 .forecast-row.today{background:rgba(22,163,74,.06);border-radius:8px;padding:9px 8px;margin:0 -8px}
 .forecast-row.past{opacity:.6}
-.fc-day{font-family:'Noto Sans Thai',sans-serif;font-size:10px;color:var(--text3);font-weight:600}
-.fc-date{font-family:'Noto Sans Thai',sans-serif;font-size:10px;color:var(--text2)}
+.fc-day{font-family:'Noto Sans Thai',sans-serif;font-size:10px;color:#6b9e6b;font-weight:600}
+.fc-date{font-family:'Noto Sans Thai',sans-serif;font-size:10px;color:#6b9e6b}
 .fc-budget{font-family:'Noto Sans Thai',sans-serif;font-weight:700;color:var(--text)}
 .fc-used{font-family:'Noto Sans Thai',sans-serif;color:var(--text2)}
 .fc-carry{font-family:'Noto Sans Thai',sans-serif;font-weight:600}
@@ -1454,7 +1454,7 @@ function openForecast(){
   const listEl = document.getElementById('forecast-list');
 
   // Header row
-  const header = `<div class="forecast-row" style="opacity:.5;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border2);padding-bottom:6px;margin-bottom:4px">
+  const header = `<div class="forecast-row" style="opacity:.8;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#6b9e6b;border-bottom:1px solid var(--border2);padding-bottom:6px;margin-bottom:4px">
     <div>Day</div><div>Date</div><div>Budget</div><div>Used</div><div>Carry</div><div></div>
   </div>`;
 
