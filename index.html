@@ -1275,22 +1275,7 @@ function renderCats(con){
       padding:10,
       callbacks:{label:c=>` ฿${fmtN(c.parsed)}`}
     }
-  },cutout:'52%',onClick:(e,els)=>{if(!els.length)return;const idx=els[0].index;rFCat=rFCat===cd[idx].id?null:cd[idx].id;renderCatDetail(cd);}},plugins:[{
-  id:'catGlow',
-  afterDatasetsDraw(chart){
-    const {ctx,data}=chart;
-    const meta=chart.getDatasetMeta(0);
-    ctx.save();
-    meta.data.forEach((arc,i)=>{
-      const col=data.datasets[0].backgroundColor[i]||'rgba(16,250,20,.6)';
-      ctx.shadowColor=col;
-      ctx.shadowBlur=16;
-      ctx.beginPath();arc.draw(ctx);
-      ctx.fillStyle=col;ctx.fill();
-    });
-    ctx.shadowBlur=0;ctx.restore();
-  }
-}]});
+  },cutout:'52%',onClick:(e,els)=>{if(!els.length)return;const idx=els[0].index;rFCat=rFCat===cd[idx].id?null:cd[idx].id;renderCatDetail(cd);}},plugins:[]});
     renderCatDetail(cd);
   },50);
 }
