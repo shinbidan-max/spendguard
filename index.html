@@ -2080,6 +2080,13 @@ function openFamilyItem(mode,editId){
   const item=editId?(FS[section]||[]).find(x=>x.id===editId):null;
   document.getElementById('fi-name').value=item?item.name:'';
   document.getElementById('fi-budget').value=item&&item.budget?item.budget:'';
+  const isExp=mode==='expense';const isAnn=mode==='annual';
+  const fiSave=document.querySelector('#mfamily-item .btn-primary');
+  const fiModal=document.querySelector('#mfamily-item .modal');
+  if(fiModal)fiModal.style.borderColor=isExp?'rgba(248,113,113,.4)':isAnn?'rgba(245,158,11,.4)':'';
+  document.querySelectorAll('#mfamily-item label').forEach(l=>{l.style.color=isExp?'#f87171':isAnn?'#f59e0b':'';});
+  document.querySelectorAll('#mfamily-item input').forEach(inp=>{inp.style.borderColor=isExp?'rgba(248,113,113,.45)':isAnn?'rgba(245,158,11,.45)':'';});
+  if(fiSave){fiSave.style.background=isExp?'linear-gradient(135deg,#ef4444,#dc2626)':isAnn?'linear-gradient(135deg,#f59e0b,#d97706)':'';fiSave.style.boxShadow=isExp?'0 4px 16px rgba(239,68,68,.35)':isAnn?'0 4px 16px rgba(245,158,11,.35)':'';fiSave.style.borderColor=isExp?'#ef4444':isAnn?'#f59e0b':'';}
   openModal('mfamily-item');
 }
 
