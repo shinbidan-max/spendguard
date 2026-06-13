@@ -1617,7 +1617,7 @@ function famTxListHTML(item, ym, mode){
   return`<div style="margin-top:6px;border-top:1px solid rgba(255,255,255,.06);padding-top:6px">
     ${txList.map(tx=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
       <div>
-        <span style="font-family:'Noto Sans Thai',sans-serif;font-size:12px;color:${mode==='expense'?'#f87171':'var(--text2)'}">฿${fmtN(tx.amount)}</span>
+        <span style="font-family:'Noto Sans Thai',sans-serif;font-size:12px;color:${mode==='expense'?'#f87171':mode==='annual'?'#f59e0b':'var(--text2)'}">฿${fmtN(tx.amount)}</span>
         ${tx.note?`<span style="font-size:11px;color:#6b7280;margin-left:6px">${esc(tx.note)}</span>`:''}
       </div>
       <div style="display:flex;gap:4px">
@@ -1625,7 +1625,7 @@ function famTxListHTML(item, ym, mode){
         <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:10px" onclick="delFamilyTx('${mode}','${item.id}','${ym}','${tx.id}')">Del</button>
       </div>
     </div>`).join('')}
-    <div style="font-size:10px;color:${mode==='expense'?'#f87171':'var(--text3)'};text-align:right;margin-top:2px;font-family:'Noto Sans Thai',sans-serif">Total: ฿${fmtN(total)}</div>
+    <div style="font-size:10px;color:${mode==='expense'?'#f87171':mode==='annual'?'#f59e0b':'var(--text3)'};text-align:right;margin-top:2px;font-family:'Noto Sans Thai',sans-serif">Total: ฿${fmtN(total)}</div>
   </div>`;
 }
 
@@ -2045,7 +2045,7 @@ function renderFamilyDetail(){
           const pct=budget>0?Math.min(100,spent/budget*100):0;
           const thisMonth=famVal((item.monthlyData||{})[ym]);
           const hasThis=ym in (item.monthlyData||{})&&famVal((item.monthlyData||{})[ym])>0;
-          return`<div class="sub-item" style="flex-direction:column;gap:8px;align-items:stretch">
+          return`<div class="sub-item" style="flex-direction:column;gap:8px;align-items:stretch;border-color:rgba(245,158,11,.25)">
             <div style="display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="display:flex;align-items:center;gap:8px">
