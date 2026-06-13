@@ -118,7 +118,6 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .bh-ring-track{fill:none;stroke:rgba(0,0,0,.28);stroke-width:12}
 .bh-ring-fill{fill:none;stroke-width:12;stroke-linecap:round;stroke-dasharray:207.35;stroke-dashoffset:207.35;transition:stroke-dashoffset 1.4s cubic-bezier(.25,.46,.45,.94),stroke .3s}
 
-.bh-ring-canvas{position:absolute;top:0;left:0;pointer-events:none}
 .bh-ring-inner{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
 .bh-ring-pct{font-size:15px;font-weight:800;color:#ffffff;line-height:1}
 .bh-ring-used{font-size:7px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.5px}
@@ -328,7 +327,6 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
         </div>
         <div class="bh-ring-wrap">
           <svg class="bh-ring-svg" viewBox="0 0 82 82"><circle class="bh-ring-track" cx="41" cy="41" r="33"/><circle class="bh-ring-fill" id="hring" cx="41" cy="41" r="33"/></svg>
-          <canvas class="bh-ring-canvas" id="hring-particles" width="82" height="82"></canvas>
           <div class="bh-ring-inner"><div class="bh-ring-pct" id="hpct">0%</div><div class="bh-ring-used">used</div></div>
         </div>
         <div class="bmo" id="hm">—</div>
@@ -998,43 +996,6 @@ function dailyB(p) {
   return calcDailyBudget(p, todayStr(), true);
 }
 
-// ═══ LIGHTNING ARC ═══
-let _ltRaf=null,_ltFrac=0,_ltBolts=[];
-function _ltBolt(maxA){
-  const s=Math.random()*.75,len=.12+Math.random()*.3,e=Math.min(s+len,1);
-  const steps=7+Math.floor(Math.random()*8),pts=[];
-  for(let i=0;i<=steps;i++){
-    const t=s+(e-s)*(i/steps),a=-Math.PI/2+t*maxA;
-    const bx=41+33*Math.cos(a),by=41+33*Math.sin(a);
-    const px=-Math.sin(a),py=Math.cos(a);
-    const off=(i===0||i===steps)?0:(Math.random()-.5)*5.5;
-    pts.push({x:bx+px*off,y:by+py*off});
-  }
-  return{pts,alpha:.85+Math.random()*.15,life:0,max:5+Math.floor(Math.random()*10),w:.6+Math.random()*.7};
-}
-function _ltDraw(){
-  const cv=document.getElementById('hring-particles');if(!cv){_ltRaf=null;return;}
-  const ctx=cv.getContext('2d');ctx.clearRect(0,0,82,82);
-  if(_ltFrac>0){
-    const maxA=_ltFrac*2*Math.PI;
-    if(Math.random()<.09&&_ltBolts.length<3)_ltBolts.push(_ltBolt(maxA));
-    _ltBolts=_ltBolts.filter(b=>{
-      const fa=b.alpha*(1-b.life/b.max);
-      ctx.lineCap='round';ctx.lineJoin='round';
-      ctx.strokeStyle=`rgba(255,255,255,${fa*.2})`;ctx.lineWidth=b.w*5;
-      ctx.beginPath();b.pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();
-      ctx.strokeStyle=`rgba(255,255,255,${fa})`;ctx.lineWidth=b.w;
-      ctx.beginPath();b.pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();
-      return ++b.life<b.max;
-    });
-  }
-  _ltRaf=requestAnimationFrame(_ltDraw);
-}
-function pfStart(pct){
-  if(_ltRaf)cancelAnimationFrame(_ltRaf);
-  _ltFrac=Math.min(pct,100)/100;_ltBolts=[];_ltDraw();
-}
-
 // ═══ RENDER HOME ═══
 function renderHome(){
   const sorted=sortedPeriods();
@@ -1059,7 +1020,7 @@ function renderHome(){
   document.getElementById('ss').textContent=fmtN(exp);
   document.getElementById('se').textContent=fmtN(inc);
   const ring=document.getElementById('hring');const pctEl=document.getElementById('hpct');
-  if(ring){const circ=207.35;const targetOff=(circ*(1-Math.min(pct,100)/100)).toFixed(2);ring.style.stroke=pct>=90?'#f87171':pct>=70?'#fbbf24':'#10FA14';ring.style.strokeDashoffset=circ;requestAnimationFrame(()=>requestAnimationFrame(()=>{ring.style.strokeDashoffset=targetOff;}));pfStart(pct);}
+  if(ring){const circ=207.35;const targetOff=(circ*(1-Math.min(pct,100)/100)).toFixed(2);ring.style.stroke=pct>=90?'#f87171':pct>=70?'#fbbf24':'#10FA14';ring.style.strokeDashoffset=circ;requestAnimationFrame(()=>requestAnimationFrame(()=>{ring.style.strokeDashoffset=targetOff;}));}
   if(pctEl)pctEl.textContent=Math.round(pct)+'%';
   const badge=document.getElementById('hbadge'),badgeText=document.getElementById('hbadge-text');
   if(badge){const bc=pct>=90?'danger':pct>=70?'warn':'safe';const bl=pct>=90?'DANGER':pct>=70?'WARNING':'SAFE';badge.className='bh-badge '+bc;if(badgeText)badgeText.textContent=bl;}
