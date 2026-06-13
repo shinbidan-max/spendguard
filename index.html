@@ -209,6 +209,14 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .rstat-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600}
 .rstat-val{font-family:'Noto Sans Thai',sans-serif;font-size:17px;font-weight:700}
 .rperiod{font-size:11px;color:var(--text2);margin-bottom:16px;font-family:'Noto Sans Thai',sans-serif;text-align:center;padding:8px 14px;background:rgba(5,10,5,.6);border:1px solid var(--border2);border-radius:8px;letter-spacing:.3px}
+.cc-card{background:rgba(6,8,6,.97);border:1px solid rgba(22,163,74,.2);border-radius:16px;padding:18px 18px 14px;margin-bottom:12px}
+.cc-hd{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.cc-ico{width:46px;height:46px;background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent)}
+.cc-ttl{font-size:18px;font-weight:700;color:#ffffff;line-height:1.2}
+.cc-sub{font-size:12px;color:#6b7280;margin-top:3px}
+.cc-leg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(22,163,74,.1)}
+.cc-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#9ca3af;cursor:pointer}
+.cc-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .rp-sel{display:flex;align-items:center;gap:8px;margin-bottom:16px;background:rgba(5,10,5,.7);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px}
 .rp-sel select{flex:1;background:transparent;border:none;color:var(--text);font-family:'Noto Sans Thai',sans-serif;font-size:13px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer}
 
@@ -1260,24 +1268,22 @@ function renderCats(con){
   pTxs(p).filter(t=>t.type==='expense').forEach(tx=>{byC[tx.category]=(byC[tx.category]||0)+(parseFloat(tx.amount)||0);});
   subsForPeriod(p).forEach(s=>{byC[s.category]=(byC[s.category]||0)+(parseFloat(s.amount)||0);});
   const cd=Object.entries(byC).map(([id,v])=>{const c=getCat(id);return{id,name:c?c.name:id,icon:c?c.icon:'📦',v};}).sort((a,b)=>b.v-a.v);
-  con.innerHTML=`<div class="rperiod">${rPLabel()}</div><div class="chart-wrap" style="height:260px"><canvas id="ccats"></canvas></div><div id="catd"></div>`;
+  window._catData=cd;
+  const legHTML=cd.map((c,i)=>`<div class="cc-leg-item" onclick="rFCat=rFCat==='${c.id}'?null:'${c.id}';renderCatDetail(window._catData)"><span class="cc-leg-dot" style="background:${COLORS[i%COLORS.length]}"></span>${c.name}</div>`).join('');
+  con.innerHTML=`<div class="cc-card">
+    <div class="cc-hd">
+      <div class="cc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></div>
+      <div><div class="cc-ttl">Expense by Category</div><div class="cc-sub">${rPLabel()}</div></div>
+    </div>
+    <div style="height:260px"><canvas id="ccats"></canvas></div>
+    <div class="cc-leg" id="cats-leg">${legHTML}</div>
+  </div><div id="catd"></div>`;
   setTimeout(()=>{
     const ctx=document.getElementById('ccats');if(!ctx)return;if(rChart){rChart.destroy();rChart=null;}
     if(!cd.length){ctx.parentElement.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px">No expense data</div>';return;}
-    const top3=cd.slice(0,3).map(c=>c.id);
-    rChart=new Chart(ctx,{type:'doughnut',data:{labels:cd.map(c=>c.name),datasets:[{data:cd.map(c=>c.v),backgroundColor:cd.map((_,i)=>COLORS[i%COLORS.length]),
-    borderWidth:0,
-    hoverOffset:14}]},options:{responsive:true,maintainAspectRatio:false,plugins:{
-    legend:{position:'bottom',labels:{color:'#4a7a4a',padding:10,font:{size:11},boxWidth:10,usePointStyle:true,pointStyle:'circle'}},
-    tooltip:{
-      backgroundColor:'rgba(3,6,3,.95)',
-      borderColor:'rgba(16,250,20,.3)',
-      borderWidth:1,
-      titleColor:'#e0ffe0',
-      bodyColor:'#4a7a4a',
-      padding:10,
-      callbacks:{label:c=>` ฿${fmtN(c.parsed)}`}
-    }
+    rChart=new Chart(ctx,{type:'doughnut',data:{labels:cd.map(c=>c.name),datasets:[{data:cd.map(c=>c.v),backgroundColor:cd.map((_,i)=>COLORS[i%COLORS.length]),borderWidth:0,hoverOffset:14}]},options:{animation:false,responsive:true,maintainAspectRatio:false,plugins:{
+    legend:{display:false},
+    tooltip:{backgroundColor:'rgba(3,6,3,.95)',borderColor:'rgba(16,250,20,.3)',borderWidth:1,titleColor:'#ffffff',bodyColor:'#9ca3af',padding:10,callbacks:{label:c=>` ฿${fmtN(c.parsed)}`}}
   },cutout:'52%',onClick:(e,els)=>{if(!els.length)return;const idx=els[0].index;rFCat=rFCat===cd[idx].id?null:cd[idx].id;renderCatDetail(cd);}},plugins:[]});
     renderCatDetail(cd);
   },50);
