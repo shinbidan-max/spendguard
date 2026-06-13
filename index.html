@@ -155,12 +155,15 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 
 /* TX */
 .tx-item{background:linear-gradient(135deg,rgba(3,6,3,.95),rgba(5,10,5,.8));border:1px solid var(--border2);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;transition:border-color .2s}
-.tx-item.pinned{background:linear-gradient(135deg,#050505,#080808);border-color:rgba(22,163,74,.45);box-shadow:0 4px 20px rgba(22,163,74,.1),inset 0 1px 0 rgba(22,163,74,.08);position:relative;overflow:hidden}
-.tx-item.pinned::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--cyan),var(--accent))}
+.tx-item.pinned{background:linear-gradient(135deg,#0a0800,#100d00);border-color:rgba(251,191,36,.4);box-shadow:0 4px 16px rgba(251,191,36,.08);position:relative;overflow:hidden}
+.tx-item.pinned::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--amber),#f59e0b)}
+.tx-item.pinned .tx-amt.e{color:var(--amber)}
+.tx-item.exp-tx{border-color:rgba(248,113,113,.25);position:relative;overflow:hidden}
+.tx-item.exp-tx::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--danger),#ef4444)}
 .tx-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;margin-top:1px}
 .tx-icon.ii{background:rgba(22,163,74,.1);box-shadow:inset 0 0 0 1px rgba(22,163,74,.18)}
-.tx-icon.ei{background:rgba(248,113,113,.1);box-shadow:inset 0 0 0 1px rgba(248,113,113,.18)}
-.tx-icon.si{background:rgba(22,163,74,.15);box-shadow:inset 0 0 0 1px rgba(22,163,74,.25)}
+.tx-icon.ei{background:rgba(248,113,113,.12);box-shadow:inset 0 0 0 1px rgba(248,113,113,.25)}
+.tx-icon.si{background:rgba(251,191,36,.12);box-shadow:inset 0 0 0 1px rgba(251,191,36,.25)}
 .tx-info{flex:1;min-width:0}
 .tx-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
 .tx-meta{font-size:11px;color:var(--text3);letter-spacing:.2px}
@@ -1071,7 +1074,7 @@ function renderHome(){
 
 function txHTML(tx){
   const cat=getCat(tx.category);const icon=cat?cat.icon:(tx.type==='income'?'💚':'❤️');const cn=cat?cat.name:(tx.category||'—');
-  return`<div class="tx-item"><div class="tx-icon ${tx.type==='income'?'ii':'ei'}">${icon}</div><div class="tx-info"><div class="tx-name">${esc(tx.desc||cn)}</div><div class="tx-meta">${cn} · ${tx.date}</div></div><div class="tx-right"><div class="tx-amt ${tx.type==='income'?'i':'e'}">${tx.type==='income'?'+':'-'}฿${fmtN(tx.amount)}</div><div class="tx-acts"><button class="btn btn-sm btn-secondary" style="padding:4px 10px" onclick="openEditTx('${tx.id}')">Edit</button><button class="btn btn-sm btn-danger" style="padding:4px 10px" onclick="delTx('${tx.id}')">Del</button></div></div></div>`;
+  return`<div class="tx-item${tx.type==='expense'?' exp-tx':''}"><div class="tx-icon ${tx.type==='income'?'ii':'ei'}">${icon}</div><div class="tx-info"><div class="tx-name">${esc(tx.desc||cn)}</div><div class="tx-meta">${cn} · ${tx.date}</div></div><div class="tx-right"><div class="tx-amt ${tx.type==='income'?'i':'e'}">${tx.type==='income'?'+':'-'}฿${fmtN(tx.amount)}</div><div class="tx-acts"><button class="btn btn-sm btn-secondary" style="padding:4px 10px" onclick="openEditTx('${tx.id}')">Edit</button><button class="btn btn-sm btn-danger" style="padding:4px 10px" onclick="delTx('${tx.id}')">Del</button></div></div></div>`;
 }
 function subPinnedHTML(s){const cat=getCat(s.category);return`<div class="tx-item pinned"><div class="tx-icon si">${cat?cat.icon:'📱'}</div><div class="tx-info"><div class="tx-name">${esc(s.name)}</div><div class="tx-meta">${cat?cat.name:'Subscription'} · recurring <span class="pin-label">AUTO</span></div></div><div class="tx-right"><div class="tx-amt e">-฿${fmtN(s.amount)}</div></div></div>`;}
 
