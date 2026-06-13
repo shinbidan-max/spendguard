@@ -2135,6 +2135,11 @@ function openFamilyVal(mode,itemId,ym,editTxId){
     document.getElementById('fv-amount').value='';
     document.getElementById('fv-note').value='';
   }
+  const isExp=mode==='expense';
+  const saveBtn=document.querySelector('#mfamily-val .btn-primary');
+  document.querySelectorAll('#mfamily-val label').forEach(l=>{l.style.color=isExp?'#f87171':'';});
+  document.querySelectorAll('#mfamily-val input').forEach(inp=>{inp.style.borderColor=isExp?'rgba(248,113,113,.45)':'';});
+  if(saveBtn){saveBtn.style.background=isExp?'linear-gradient(135deg,#ef4444,#dc2626)':'';saveBtn.style.boxShadow=isExp?'0 4px 16px rgba(239,68,68,.35)':'';saveBtn.style.borderColor=isExp?'#ef4444':'';}
   openModal('mfamily-val');
   setTimeout(()=>document.getElementById('fv-amount').select(),200);
 }
