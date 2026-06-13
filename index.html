@@ -388,14 +388,14 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
   <!-- REPORTS -->
   <div class="page" id="page-reports">
     <div class="stitle" style="margin-bottom:12px">Expense Report</div>
+    <div class="rtabs">
+      <div class="rtab active" onclick="setRTab(this,'categories')">Categories</div>
+      <div class="rtab" onclick="setRTab(this,'compare')">Compare</div>
+    </div>
     <div id="rp-sel-wrap" class="rp-sel">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--accent);flex-shrink:0"><rect x="1" y="2" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4 1v2M10 1v2M1 6h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
       <select id="rp-period-sel" onchange="onRPeriodChange()"></select>
       <svg width="10" height="7" viewBox="0 0 10 7" fill="none" style="color:var(--text3);flex-shrink:0"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    </div>
-    <div class="rtabs">
-      <div class="rtab active" onclick="setRTab(this,'categories')">Categories</div>
-      <div class="rtab" onclick="setRTab(this,'compare')">Compare</div>
     </div>
     <div id="rc"></div>
   </div>
