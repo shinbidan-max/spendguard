@@ -2017,7 +2017,7 @@ function renderFamilyDetail(){
           const actual=famVal((item.monthlyData||{})[ym]);
           const budget=parseFloat(item.budget)||0;
           const hasActual=ym in (item.monthlyData||{})&&famVal((item.monthlyData||{})[ym])>0;
-          return`<div class="sub-item" style="flex-direction:column;gap:6px;align-items:stretch">
+          return`<div class="sub-item" style="flex-direction:column;gap:6px;align-items:stretch;border-color:rgba(248,113,113,.25)">
             <div style="display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="display:flex;align-items:center;gap:8px">
@@ -2026,7 +2026,7 @@ function renderFamilyDetail(){
                 </div>
                 <div style="font-size:11px;color:#6b7280;margin-top:2px">Plan ฿${fmtN(budget)}/mo ${hasActual?diffBadge(actual,budget,false):''}</div>
               </div>
-              <button class="btn btn-sm btn-primary" style="padding:4px 10px" onclick="openFamilyVal('expense','${item.id}','${ym}')">+ Add</button>
+              <button class="btn btn-sm" style="padding:4px 10px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border-color:#ef4444;box-shadow:0 4px 14px rgba(239,68,68,.3)" onclick="openFamilyVal('expense','${item.id}','${ym}')">+ Add</button>
             </div>
             ${famTxListHTML(item,ym,'expense')}
           </div>`;
