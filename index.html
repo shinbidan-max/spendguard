@@ -1991,7 +1991,7 @@ function renderFamilyDetail(){
                   <span style="font-size:14px;font-weight:600;cursor:pointer;color:#ffffff" onclick="openFamilyTrend('revenue','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
                   <button class="btn btn-sm btn-secondary" style="padding:2px 6px;font-size:10px" onclick="openFamilyItem('revenue','${item.id}')">Edit</button>
                 </div>
-                <div style="font-size:11px;color:var(--text3);margin-top:2px">Plan ฿${fmtN(budget)}/mo ${hasActual?diffBadge(actual,budget,true):''}</div>
+                <div style="font-size:11px;color:#6b7280;margin-top:2px">Plan ฿${fmtN(budget)}/mo ${hasActual?diffBadge(actual,budget,true):''}</div>
               </div>
               <button class="btn btn-sm btn-primary" style="padding:4px 10px" onclick="openFamilyVal('revenue','${item.id}','${ym}')">+ Add</button>
             </div>
@@ -2024,7 +2024,7 @@ function renderFamilyDetail(){
                   <span style="font-size:14px;font-weight:600;cursor:pointer;color:#ffffff" onclick="openFamilyTrend('expense','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
                   <button class="btn btn-sm btn-secondary" style="padding:2px 6px;font-size:10px" onclick="openFamilyItem('expense','${item.id}')">Edit</button>
                 </div>
-                <div style="font-size:11px;color:var(--text3);margin-top:2px">Plan ฿${fmtN(budget)}/mo ${hasActual?diffBadge(actual,budget,false):''}</div>
+                <div style="font-size:11px;color:#6b7280;margin-top:2px">Plan ฿${fmtN(budget)}/mo ${hasActual?diffBadge(actual,budget,false):''}</div>
               </div>
               <button class="btn btn-sm btn-primary" style="padding:4px 10px" onclick="openFamilyVal('expense','${item.id}','${ym}')">+ Add</button>
             </div>
