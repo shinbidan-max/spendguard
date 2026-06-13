@@ -1312,77 +1312,11 @@ function drawCompare(){
   else if(ctype==='income')ds=[{label:'Income',data:slots.map(p=>sv(p,'income')),backgroundColor:slots.map(p=>p?'rgba(16,250,20,.2)':'rgba(16,250,20,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(16,250,20,.5)':'transparent'),borderWidth:1}];
   else ds=[{label:'Expense',data:slots.map(p=>sv(p,'expense')),backgroundColor:slots.map(p=>p?'rgba(248,113,113,.2)':'rgba(248,113,113,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(248,113,113,.5)':'transparent'),borderWidth:1}];
 
-  // Running border light plugin
-  const _borderLight={
-    id:'barBorderLight',
-    afterDatasetsDraw(chart){
-      if(chart.canvas.id!=='ccomp')return;
-      const{ctx}=chart;
-      const t=(Date.now()/1200)%1;
-      chart.data.datasets.forEach((ds,di)=>{
-        const meta=chart.getDatasetMeta(di);
-        const col=di===0?[45,212,191]:[248,113,113];
-        const glowCol=`rgba(${col[0]},${col[1]},${col[2]},.5)`;
-        // Glow pass on bar fill
-        ctx.save();ctx.shadowColor=glowCol;ctx.shadowBlur=14;
-        meta.data.forEach(bar=>bar.draw(ctx));
-        ctx.shadowBlur=0;ctx.restore();
-        // Running light on bar border
-        meta.data.forEach((bar,bi)=>{
-          if((chart.data.datasets[di].data[bi]||0)<=0)return;
-          const props=bar.getProps(['x','y','base','width']);
-          const bx=props.x,by=props.y,bb=props.base,bw=props.width;
-          const h=bb-by;if(h<8)return;
-          const r=6; // border radius
-          const x1=bx-bw/2,x2=bx+bw/2;
-          // Perimeter = 2*(bw+h) approx
-          const perimeter=2*(bw+h);
-          // offset per bar so they don't all sync
-          const phase=(t+bi*0.15+di*0.3)%1;
-          const pos=phase*perimeter;
-          // Draw glowing dot that travels the perimeter
-          // Perimeter segments: bottom, right, top, left
-          const segments=[
-            {len:bw, x:(d)=>x1+d, y:()=>bb},          // bottom L→R
-            {len:h,  x:()=>x2,    y:(d)=>bb-d},        // right bottom→top
-            {len:bw, x:(d)=>x2-d, y:()=>by},           // top R→L
-            {len:h,  x:()=>x1,    y:(d)=>by+d},        // left top→bottom
-          ];
-          let rem=pos, px2=x1, py2=bb;
-          for(const seg of segments){
-            if(rem<=seg.len){
-              px2=seg.x(rem);py2=seg.y(rem);break;
-            }
-            rem-=seg.len;
-          }
-          // Draw glowing orb at position
-          ctx.save();
-          const grd=ctx.createRadialGradient(px2,py2,0,px2,py2,8);
-          grd.addColorStop(0,`rgba(${col[0]},${col[1]},${col[2]},0.95)`);
-          grd.addColorStop(0.4,`rgba(${col[0]},${col[1]},${col[2]},0.4)`);
-          grd.addColorStop(1,`rgba(${col[0]},${col[1]},${col[2]},0)`);
-          ctx.beginPath();ctx.arc(px2,py2,8,0,Math.PI*2);
-          ctx.fillStyle=grd;
-          ctx.shadowColor=`rgba(${col[0]},${col[1]},${col[2]},1)`;
-          ctx.shadowBlur=16;ctx.fill();
-          // Bright core
-          ctx.beginPath();ctx.arc(px2,py2,2.5,0,Math.PI*2);
-          ctx.fillStyle=`rgba(255,255,255,0.9)`;
-          ctx.shadowBlur=10;ctx.fill();
-          ctx.restore();
-        });
-      });
-      chart._lightRAF=requestAnimationFrame(()=>{try{if(chart.canvas)chart.draw();}catch{}});
-    },
-    beforeDestroy(chart){if(chart._lightRAF)cancelAnimationFrame(chart._lightRAF);}
-  };
-  try{Chart.unregister(_borderLight);}catch{}
-  Chart.register(_borderLight);
-
   rChart=new Chart(ctx,{
     type:'bar',
     data:{labels,datasets:ds},
     options:{
+      animation:false,
       responsive:true,
       maintainAspectRatio:false,
       plugins:{
