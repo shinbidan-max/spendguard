@@ -1287,13 +1287,11 @@ function renderCatDetail(cd){const el=document.getElementById('catd');if(!el)ret
 function renderCompare(con){
   const expCats=(S.categories||[]).filter(c=>c.type==='expense');
   con.innerHTML=`<div class="rperiod">Last 6 periods · newest on right</div>
-  <div style="margin-bottom:10px"><div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">View</div>
-  <div class="chip-group" id="ctc"><div class="chip active" data-ct="both" onclick="setCType(this)">Income vs Expense</div><div class="chip" data-ct="income" onclick="setCType(this)">Income only</div><div class="chip" data-ct="expense" onclick="setCType(this)">Expense only</div></div></div>
-  <div style="margin-bottom:16px"><div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Or by category</div>
+  <div style="margin-bottom:16px"><div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Category</div>
   <div class="chip-group" id="ccc"><div class="chip active" onclick="setCCat(this,null)">All expenses</div>${expCats.map(c=>`<div class="chip" onclick="setCCat(this,'${c.id}')">${c.name}</div>`).join('')}</div></div>
   <div class="chart-wrap" style="height:260px"><canvas id="ccomp"></canvas></div>
   <div id="compd"></div>`;
-  cCatId=null;window._cType='both';setTimeout(drawCompare,50);
+  cCatId=null;window._cType='expense';setTimeout(drawCompare,50);
 }
 function setCType(el){document.querySelectorAll('#ctc .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');window._cType=el.dataset.ct;cCatId=null;document.querySelectorAll('#ccc .chip').forEach(c=>c.classList.remove('active'));document.querySelector('#ccc .chip').classList.add('active');document.getElementById('compd').innerHTML='';drawCompare();}
 function setCCat(el,id){document.querySelectorAll('#ccc .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');cCatId=id;if(id){window._cType=null;document.querySelectorAll('#ctc .chip').forEach(c=>c.classList.remove('active'));}document.getElementById('compd').innerHTML='';drawCompare();}
