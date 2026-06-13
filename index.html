@@ -117,10 +117,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .bh-ring-svg{width:82px;height:82px;transform:rotate(-90deg)}
 .bh-ring-track{fill:none;stroke:rgba(0,0,0,.28);stroke-width:12}
 .bh-ring-fill{fill:none;stroke-width:12;stroke-linecap:round;stroke-dasharray:207.35;stroke-dashoffset:207.35;transition:stroke-dashoffset 1.4s cubic-bezier(.25,.46,.45,.94),stroke .3s}
-@keyframes p-flicker{0%,100%{opacity:.1}7%{opacity:.38}15%{opacity:.05}23%{opacity:.32}31%{opacity:.14}40%{opacity:.40}48%{opacity:.04}56%{opacity:.28}64%{opacity:.16}73%{opacity:.36}83%{opacity:.07}92%{opacity:.24}}
-@keyframes p-glow{0%,100%{opacity:.07}15%{opacity:.18}30%{opacity:.06}47%{opacity:.20}63%{opacity:.08}79%{opacity:.16}93%{opacity:.05}}
-.bh-ring-glow{fill:none;stroke-width:22;stroke-linecap:round;stroke-dasharray:207.35;stroke-dashoffset:207.35;transition:stroke-dashoffset 1.4s cubic-bezier(.25,.46,.45,.94);animation:p-glow 4.1s ease-in-out infinite}
-.bh-ring-plasma{fill:none;stroke:rgba(255,255,255,.9);stroke-width:7;stroke-linecap:round;stroke-dasharray:207.35;stroke-dashoffset:207.35;transition:stroke-dashoffset 1.4s cubic-bezier(.25,.46,.45,.94);animation:p-flicker 2s ease-in-out infinite}
+
 .bh-ring-inner{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
 .bh-ring-pct{font-size:15px;font-weight:800;color:#ffffff;line-height:1}
 .bh-ring-used{font-size:7px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.5px}
@@ -329,7 +326,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
           </div>
         </div>
         <div class="bh-ring-wrap">
-          <svg class="bh-ring-svg" viewBox="0 0 82 82"><circle class="bh-ring-track" cx="41" cy="41" r="33"/><circle class="bh-ring-fill" id="hring" cx="41" cy="41" r="33"/><circle class="bh-ring-glow" id="hring-glow" cx="41" cy="41" r="33"/><circle class="bh-ring-plasma" id="hring-plasma" cx="41" cy="41" r="33"/></svg>
+          <svg class="bh-ring-svg" viewBox="0 0 82 82"><circle class="bh-ring-track" cx="41" cy="41" r="33"/><circle class="bh-ring-fill" id="hring" cx="41" cy="41" r="33"/></svg>
           <div class="bh-ring-inner"><div class="bh-ring-pct" id="hpct">0%</div><div class="bh-ring-used">used</div></div>
         </div>
         <div class="bmo" id="hm">—</div>
@@ -1023,7 +1020,7 @@ function renderHome(){
   document.getElementById('ss').textContent=fmtN(exp);
   document.getElementById('se').textContent=fmtN(inc);
   const ring=document.getElementById('hring');const pctEl=document.getElementById('hpct');
-  if(ring){const circ=207.35;const targetOff=(circ*(1-Math.min(pct,100)/100)).toFixed(2);const ringColor=pct>=90?'#f87171':pct>=70?'#fbbf24':'#10FA14';ring.style.stroke=ringColor;ring.style.strokeDashoffset=circ;const glow=document.getElementById('hring-glow');const plasma=document.getElementById('hring-plasma');if(glow){glow.style.stroke=ringColor;glow.style.strokeDashoffset=circ;}if(plasma){plasma.style.strokeDashoffset=circ;}requestAnimationFrame(()=>requestAnimationFrame(()=>{ring.style.strokeDashoffset=targetOff;if(glow)glow.style.strokeDashoffset=targetOff;if(plasma)plasma.style.strokeDashoffset=targetOff;}));}
+  if(ring){const circ=207.35;const targetOff=(circ*(1-Math.min(pct,100)/100)).toFixed(2);ring.style.stroke=pct>=90?'#f87171':pct>=70?'#fbbf24':'#10FA14';ring.style.strokeDashoffset=circ;requestAnimationFrame(()=>requestAnimationFrame(()=>{ring.style.strokeDashoffset=targetOff;}));}
   if(pctEl)pctEl.textContent=Math.round(pct)+'%';
   const badge=document.getElementById('hbadge'),badgeText=document.getElementById('hbadge-text');
   if(badge){const bc=pct>=90?'danger':pct>=70?'warn':'safe';const bl=pct>=90?'DANGER':pct>=70?'WARNING':'SAFE';badge.className='bh-badge '+bc;if(badgeText)badgeText.textContent=bl;}
