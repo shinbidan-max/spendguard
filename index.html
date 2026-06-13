@@ -377,8 +377,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
       <svg width="10" height="7" viewBox="0 0 10 7" fill="none" style="color:var(--text3);flex-shrink:0"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     </div>
     <div class="rtabs">
-      <div class="rtab active" onclick="setRTab(this,'overview')">Overview</div>
-      <div class="rtab" onclick="setRTab(this,'categories')">Categories</div>
+      <div class="rtab active" onclick="setRTab(this,'categories')">Categories</div>
       <div class="rtab" onclick="setRTab(this,'compare')">Compare</div>
     </div>
     <div id="rc"></div>
@@ -578,7 +577,7 @@ const DEF_CATS=[
 let S={periods:[],categories:[],subscriptions:[],transactions:[],streak:0,passwordHash:'',lastSync:null};
 let selPeriodIdx=0,txPeriodId=null,rPeriodId=null;
 let txType='expense',eTxType='expense',editTxId=null,editSubId=null,editPeriodId=null;
-let rTab='overview',txF='all',rChart=null,rFType=null,rFCat=null,cCatId=null;
+let rTab='categories',txF='all',rChart=null,rFType=null,rFCat=null,cCatId=null;
 
 // ═══ CRYPTO ═══
 async function hashPwd(p){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
