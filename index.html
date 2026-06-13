@@ -78,50 +78,23 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .hdots{display:flex;justify-content:center;gap:5px;margin-top:8px}
 .hdot{width:5px;height:5px;border-radius:50%;background:var(--surface3);transition:all .3s}
 .hdot.active{background:var(--cyan);width:16px;border-radius:3px;box-shadow:0 0 6px var(--cyan-glow)}
-.budget-hero{background:linear-gradient(135deg,rgba(3,6,3,.85) 0%,rgba(4,8,4,.8) 50%,rgba(3,6,3,.85) 100%);border:1px solid rgba(16,250,20,.12);border-radius:var(--radius);padding:22px 20px 18px;position:relative;overflow:hidden;user-select:none;box-shadow:0 8px 32px rgba(0,0,0,.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.budget-hero::before{content:'';position:absolute;top:-50px;right:-30px;width:220px;height:220px;background:radial-gradient(circle,rgba(16,250,20,.07) 0%,rgba(16,250,20,.04) 50%,transparent 70%);z-index:0}
-/* Active period glass glow */
-.budget-hero.active-period{
-  border:1.5px solid transparent;
-  background:
-    linear-gradient(135deg,#050505,#080808,#060606) padding-box,
-    conic-gradient(from var(--ba,0deg),#050505 0%,#10FA14 15%,#10FA14 25%,#10FA14 35%,#050505 50%,#050505 100%) border-box;
-  box-shadow:0 0 25px 4px rgba(16,250,20,.35),0 0 60px 8px rgba(16,250,20,.2),0 8px 32px rgba(0,0,0,.4);
-  animation:borderRun 2.5s linear infinite;
-  overflow:hidden
-}
-/* Static glass sheen - diagonal highlight only */
-.budget-hero.active-period::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:linear-gradient(125deg,
-    rgba(255,255,255,.04) 0%,
-    rgba(255,255,255,.0) 50%,
-    rgba(0,0,0,.0) 100%
-  );
-  pointer-events:none;
-  z-index:1;
-  border-radius:var(--radius)
-}
-@property --ba{syntax:'<angle>';initial-value:0deg;inherits:false}
-@keyframes borderRun{to{--ba:360deg}}
-
-.budget-hero.future{border-color:rgba(251,191,36,.25);background:linear-gradient(135deg,#080808 0%,#080808 100%);box-shadow:0 8px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(251,191,36,.08)}
-.budget-hero.past{border-color:rgba(20,50,20,.4);opacity:.85}
+.budget-hero{background:#050505;border:1px solid rgba(16,250,20,.2);border-radius:var(--radius);padding:22px 20px 18px;position:relative;overflow:hidden;user-select:none}
+.budget-hero.active-period{border-color:rgba(16,250,20,.45)}
+.budget-hero.future{border-color:rgba(251,191,36,.3)}
+.budget-hero.past{border-color:rgba(20,50,20,.3);opacity:.85}
 .bpl{font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:3px;font-family:'Noto Sans Thai',sans-serif;opacity:.75}
 .bmo{font-family:'Noto Sans Thai',sans-serif;font-size:19px;font-weight:700;margin-bottom:14px;letter-spacing:-.3px}
 
-.bamt{font-family:'Noto Sans Thai',sans-serif;font-size:34px;font-weight:500;letter-spacing:-1px;margin-bottom:3px;text-shadow:0 0 30px rgba(16,250,20,.15)}
+.bamt{font-family:'Noto Sans Thai',sans-serif;font-size:34px;font-weight:500;letter-spacing:-1px;margin-bottom:3px}
 .bamt .cy{font-size:18px;color:var(--cyan);margin-right:2px;opacity:.8}
 .bprog{width:100%;height:5px;background:rgba(255,255,255,.06);border-radius:99px;margin:12px 0 10px;overflow:hidden}
-.bpb{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--cyan));transition:width .6s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 8px var(--accent-glow)}
-.bpb.w{background:linear-gradient(90deg,var(--amber),#f59e0b);box-shadow:0 0 8px var(--amber-glow)}
-.bpb.d{background:linear-gradient(90deg,var(--danger),#ef4444);box-shadow:0 0 8px var(--danger-glow)}
+.bpb{height:100%;border-radius:99px;background:var(--accent);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.bpb.w{background:var(--amber)}
+.bpb.d{background:var(--danger)}
 .bstats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
 .bsl{font-size:8px;color:var(--text3);letter-spacing:.8px;margin-bottom:3px;text-transform:uppercase;font-weight:600}
 .bsv{font-family:'Noto Sans Thai',sans-serif;font-size:11px;font-weight:700}
-.bsv.g{color:var(--teal);text-shadow:0 0 8px var(--teal-glow)}.bsv.r{color:var(--danger)}.bsv.y{color:var(--amber)}
+.bsv.g{color:var(--teal)}.bsv.r{color:var(--danger)}.bsv.y{color:var(--amber)}
 
 /* DAILY CARD */
 .daily-card{background:linear-gradient(135deg,#050505,#080808);border:1px solid rgba(16,250,20,.18);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.3),inset 0 1px 0 rgba(16,250,20,.06)}
