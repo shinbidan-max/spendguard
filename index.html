@@ -67,8 +67,8 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 0 4px;cursor:pointer;transition:all .2s;color:var(--text3);font-size:9px;font-weight:500;letter-spacing:.4px;text-transform:uppercase;position:relative;overflow:visible}
 .ni-ico{width:68px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:18px;transition:all .2s}
 .ni.active{color:#10FA14}.ni.active .ni-ico{background:var(--accent);box-shadow:0 4px 16px rgba(22,163,74,.35)}.ni.active svg{color:#ffffff}
-@keyframes nav-star-rise{0%{opacity:0;transform:translateY(0) scale(0) rotate(0deg)}25%{opacity:1;transform:translateY(-8px) scale(1) rotate(20deg)}100%{opacity:0;transform:translateY(-26px) scale(0.4) rotate(60deg)}}
-.nav-star{position:absolute;width:4px;height:4px;background:#ffffff;border-radius:1px;transform:rotate(45deg);pointer-events:none;animation:nav-star-rise ease-out forwards;box-shadow:0 0 5px rgba(255,255,255,.9),0 0 10px rgba(16,250,20,.6)}
+@keyframes nav-star-rise{0%{opacity:0;transform:translateY(0) scale(0)}30%{opacity:.9;transform:translateY(-5px) scale(1)}100%{opacity:0;transform:translateY(-16px) scale(0.3)}}
+.nav-star{position:absolute;width:2px;height:2px;background:#ffffff;border-radius:50%;pointer-events:none;animation:nav-star-rise ease-out forwards;box-shadow:0 0 4px rgba(255,255,255,.95),0 0 8px rgba(16,250,20,.6)}
 .page{display:none;padding:20px 20px 120px}.page.active{display:block}
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .stitle{font-family:'Noto Sans Thai',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3)}
@@ -782,9 +782,9 @@ function askConfirm(title,msg,onOk){document.getElementById('conf-t').textConten
 
 // ═══ NAV ═══
 let _navStarTimer=null;
-const _starLeftPool=[18,28,38,50,62,72,82];const _starDurPool=[.85,.95,1.05,.9,1.0,.8,1.1];let _starIdx=0;
-function spawnOneNavStar(ni){const ico=ni.querySelector('.ni-ico');if(!ico)return;const s=document.createElement('span');s.className='nav-star';const icoRect=ico.getBoundingClientRect();const niRect=ni.getBoundingClientRect();const top=icoRect.top-niRect.top+icoRect.height*.25;const l=_starLeftPool[_starIdx%_starLeftPool.length];const dur=_starDurPool[_starIdx%_starDurPool.length];_starIdx++;s.style.cssText=`left:${l}%;top:${top}px;animation-duration:${dur}s`;ni.appendChild(s);s.addEventListener('animationend',()=>s.remove());}
-function startNavStars(ni){spawnOneNavStar(ni);if(_navStarTimer)clearInterval(_navStarTimer);_navStarTimer=setInterval(()=>{const active=document.querySelector('.ni.active');if(active)spawnOneNavStar(active);},380);}
+const _starLeftPool=[10,20,32,44,56,68,80,90];const _starDurPool=[.75,.85,.9,.8,.95,.7,.88,.82];const _starTopOff=[.7,.55,.65,.75,.6,.7,.5,.65];let _starIdx=0;
+function spawnOneNavStar(ni){const ico=ni.querySelector('.ni-ico');if(!ico)return;const s=document.createElement('span');s.className='nav-star';const icoRect=ico.getBoundingClientRect();const niRect=ni.getBoundingClientRect();const i=_starIdx%_starLeftPool.length;const topBase=icoRect.top-niRect.top;const top=topBase+icoRect.height*_starTopOff[i];const l=_starLeftPool[i];const dur=_starDurPool[i];_starIdx++;s.style.cssText=`left:${l}%;top:${top}px;animation-duration:${dur}s`;ni.appendChild(s);s.addEventListener('animationend',()=>s.remove());}
+function startNavStars(ni){spawnOneNavStar(ni);if(_navStarTimer)clearInterval(_navStarTimer);_navStarTimer=setInterval(()=>{const active=document.querySelector('.ni.active');if(active)spawnOneNavStar(active);},220);}
 function spawnNavStars(ni){startNavStars(ni);}
 function showPage(n){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
