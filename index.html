@@ -118,6 +118,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .bh-ring-track{fill:none;stroke:rgba(0,0,0,.28);stroke-width:12}
 .bh-ring-fill{fill:none;stroke-width:12;stroke-linecap:round;stroke-dasharray:207.35;stroke-dashoffset:207.35;transition:stroke-dashoffset 1.4s cubic-bezier(.25,.46,.45,.94),stroke .3s}
 
+.bh-ring-canvas{position:absolute;top:0;left:0;pointer-events:none}
 .bh-ring-inner{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
 .bh-ring-pct{font-size:15px;font-weight:800;color:#ffffff;line-height:1}
 .bh-ring-used{font-size:7px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.5px}
@@ -327,6 +328,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
         </div>
         <div class="bh-ring-wrap">
           <svg class="bh-ring-svg" viewBox="0 0 82 82"><circle class="bh-ring-track" cx="41" cy="41" r="33"/><circle class="bh-ring-fill" id="hring" cx="41" cy="41" r="33"/></svg>
+          <canvas class="bh-ring-canvas" id="hring-particles" width="82" height="82"></canvas>
           <div class="bh-ring-inner"><div class="bh-ring-pct" id="hpct">0%</div><div class="bh-ring-used">used</div></div>
         </div>
         <div class="bmo" id="hm">—</div>
@@ -996,6 +998,37 @@ function dailyB(p) {
   return calcDailyBudget(p, todayStr(), true);
 }
 
+// ═══ PARTICLE FLOW ═══
+let _pfRaf=null,_pfFrac=0;
+const _pfP=[];
+function _pfInit(frac){
+  _pfFrac=frac;_pfP.length=0;
+  for(let i=0;i<7;i++)_pfP.push({t:i/7+Math.random()*.08,spd:.0014+Math.random()*.0018,sz:1.2+Math.random()*1.1,a:.5+Math.random()*.38});
+}
+function _pfDraw(){
+  const cv=document.getElementById('hring-particles');if(!cv){_pfRaf=null;return;}
+  const ctx=cv.getContext('2d');ctx.clearRect(0,0,82,82);
+  if(_pfFrac>0){
+    const maxA=_pfFrac*2*Math.PI;
+    for(const p of _pfP){
+      p.t+=p.spd;if(p.t>=1)p.t-=1;
+      const a=-Math.PI/2+p.t*maxA;
+      const x=41+33*Math.cos(a),y=41+33*Math.sin(a);
+      const g=ctx.createRadialGradient(x,y,0,x,y,p.sz*2.8);
+      g.addColorStop(0,`rgba(255,255,255,${p.a})`);
+      g.addColorStop(.45,`rgba(255,255,255,${p.a*.3})`);
+      g.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,p.sz*2.8,0,Math.PI*2);ctx.fill();
+    }
+  }
+  _pfRaf=requestAnimationFrame(_pfDraw);
+}
+function pfStart(pct){
+  if(_pfRaf)cancelAnimationFrame(_pfRaf);
+  _pfInit(Math.min(pct,100)/100);
+  _pfDraw();
+}
+
 // ═══ RENDER HOME ═══
 function renderHome(){
   const sorted=sortedPeriods();
@@ -1020,7 +1053,7 @@ function renderHome(){
   document.getElementById('ss').textContent=fmtN(exp);
   document.getElementById('se').textContent=fmtN(inc);
   const ring=document.getElementById('hring');const pctEl=document.getElementById('hpct');
-  if(ring){const circ=207.35;const targetOff=(circ*(1-Math.min(pct,100)/100)).toFixed(2);ring.style.stroke=pct>=90?'#f87171':pct>=70?'#fbbf24':'#10FA14';ring.style.strokeDashoffset=circ;requestAnimationFrame(()=>requestAnimationFrame(()=>{ring.style.strokeDashoffset=targetOff;}));}
+  if(ring){const circ=207.35;const targetOff=(circ*(1-Math.min(pct,100)/100)).toFixed(2);ring.style.stroke=pct>=90?'#f87171':pct>=70?'#fbbf24':'#10FA14';ring.style.strokeDashoffset=circ;requestAnimationFrame(()=>requestAnimationFrame(()=>{ring.style.strokeDashoffset=targetOff;}));pfStart(pct);}
   if(pctEl)pctEl.textContent=Math.round(pct)+'%';
   const badge=document.getElementById('hbadge'),badgeText=document.getElementById('hbadge-text');
   if(badge){const bc=pct>=90?'danger':pct>=70?'warn':'safe';const bl=pct>=90?'DANGER':pct>=70?'WARNING':'SAFE';badge.className='bh-badge '+bc;if(badgeText)badgeText.textContent=bl;}
