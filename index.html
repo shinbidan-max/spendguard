@@ -117,6 +117,9 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .bh-ring-svg{width:82px;height:82px;transform:rotate(-90deg)}
 .bh-ring-track{fill:none;stroke:rgba(0,0,0,.28);stroke-width:12}
 .bh-ring-fill{fill:none;stroke-width:12;stroke-linecap:round;stroke-dasharray:207.35;stroke-dashoffset:207.35;transition:stroke-dashoffset 1.4s cubic-bezier(.25,.46,.45,.94),stroke .3s}
+@keyframes arc-spin{to{transform:rotate(360deg)}}
+.bh-arc-glow{fill:none;stroke:rgba(210,255,80,.22);stroke-width:18;stroke-linecap:round;stroke-dasharray:24 183.35;transform-origin:41px 41px;animation:arc-spin 4s linear infinite}
+.bh-arc{fill:none;stroke:rgba(255,255,160,.88);stroke-width:3;stroke-linecap:round;stroke-dasharray:18 189.35;transform-origin:41px 41px;animation:arc-spin 4s linear infinite}
 .bh-ring-inner{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
 .bh-ring-pct{font-size:15px;font-weight:800;color:#ffffff;line-height:1}
 .bh-ring-used{font-size:7px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.5px}
@@ -325,7 +328,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
           </div>
         </div>
         <div class="bh-ring-wrap">
-          <svg class="bh-ring-svg" viewBox="0 0 82 82"><circle class="bh-ring-track" cx="41" cy="41" r="33"/><circle class="bh-ring-fill" id="hring" cx="41" cy="41" r="33"/></svg>
+          <svg class="bh-ring-svg" viewBox="0 0 82 82"><circle class="bh-ring-track" cx="41" cy="41" r="33"/><circle class="bh-ring-fill" id="hring" cx="41" cy="41" r="33"/><circle class="bh-arc-glow" cx="41" cy="41" r="33"/><circle class="bh-arc" cx="41" cy="41" r="33"/></svg>
           <div class="bh-ring-inner"><div class="bh-ring-pct" id="hpct">0%</div><div class="bh-ring-used">used</div></div>
         </div>
         <div class="bmo" id="hm">—</div>
