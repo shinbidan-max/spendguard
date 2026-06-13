@@ -1059,7 +1059,7 @@ function renderHome(){
     const bottomRow=document.getElementById('daily-card-bottom');if(bottomRow)bottomRow.style.display='none';
     const daysInfoEl3=document.getElementById('hdaysinfo');const dailyEl3=document.getElementById('hdaily');
     if(daysInfoEl3)daysInfoEl3.textContent='Upcoming period';if(dailyEl3)dailyEl3.textContent='—';
-    const sublabel3=document.getElementById('bh-sublabel');if(sublabel3){sublabel3.style.display='flex';sublabel3.innerHTML='Upcoming budget';}
+    const sublabel3=document.getElementById('bh-sublabel');if(sublabel3)sublabel3.style.display='none';
   }
   const tp=todayPeriod();const meb=document.getElementById('meb');
   if(tp&&tp.id===p.id&&daysLeft(p)===0){meb.classList.add('show');if(rem>0){document.getElementById('be').textContent='🏆';document.getElementById('bt').textContent='Period complete! You saved money!';document.getElementById('bs').textContent=`฿${fmtN(rem)} left · ${(S.streak||0)+1} month streak 🔥`;}else{document.getElementById('be').textContent='📅';document.getElementById('bt').textContent='Period ended';document.getElementById('bs').textContent='Ready for a new period?';}}else meb.classList.remove('show');
