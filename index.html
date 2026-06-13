@@ -1330,6 +1330,7 @@ function drawCompare(){
       animation:false,
       responsive:true,
       maintainAspectRatio:false,
+      layout:{padding:{top:24}},
       plugins:{
         legend:{display:false},
         tooltip:{backgroundColor:'rgba(3,6,3,.95)',borderColor:'rgba(16,250,20,.3)',borderWidth:1,titleColor:'#ffffff',bodyColor:'#9ca3af',padding:10,callbacks:{label:c=>` ฿${fmtN(c.parsed.y)}`}}
