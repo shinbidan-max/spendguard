@@ -781,7 +781,10 @@ async function changePwd(){const c=document.getElementById('pc').value,n1=docume
 function askConfirm(title,msg,onOk){document.getElementById('conf-t').textContent=title;document.getElementById('conf-m').textContent=msg;const old=document.getElementById('conf-ok');const nb=old.cloneNode(true);old.parentNode.replaceChild(nb,old);nb.addEventListener('click',()=>{closeModal('mconf');onOk();});openModal('mconf')}
 
 // ═══ NAV ═══
-function spawnNavStars(ni){const ico=ni.querySelector('.ni-ico');if(!ico)return;const offsets=[15,28,42,58,72,85];const durs=[.9,1.05,.85,1.1,.95,.8];const delays=[0,.08,.15,.05,.12,.04];const icoRect=ico.getBoundingClientRect();const niRect=ni.getBoundingClientRect();const top=icoRect.top-niRect.top+icoRect.height*.35;offsets.forEach((l,i)=>{const s=document.createElement('span');s.className='nav-star';s.style.cssText=`left:${l}%;top:${top}px;animation-duration:${durs[i]}s;animation-delay:${delays[i]}s`;ni.appendChild(s);s.addEventListener('animationend',()=>s.remove());});}
+let _navStarTimer=null;let _starSeq=0;
+const _starL=[15,28,42,58,72,85];const _starD=[.9,1.05,.85,1.1,.95,.8];
+function _spawnOneStar(ni){const ico=ni.querySelector('.ni-ico');if(!ico)return;const i=_starSeq%_starL.length;_starSeq++;const s=document.createElement('span');s.className='nav-star';const icoRect=ico.getBoundingClientRect();const niRect=ni.getBoundingClientRect();const top=icoRect.top-niRect.top+icoRect.height*.35;s.style.cssText=`left:${_starL[i]}%;top:${top}px;animation-duration:${_starD[i]}s`;ni.appendChild(s);s.addEventListener('animationend',()=>s.remove());}
+function spawnNavStars(ni){_spawnOneStar(ni);if(_navStarTimer)clearInterval(_navStarTimer);_navStarTimer=setInterval(()=>{const a=document.querySelector('.ni.active');if(a)_spawnOneStar(a);},280);}
 function showPage(n){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
@@ -2181,7 +2184,7 @@ function renderAll(){
   const rp=document.getElementById('page-reports');if(rp&&rp.classList.contains('active')){populateRPeriodSel();renderReports();}
 }
 
-init();
+init().then(()=>{const a=document.querySelector('.ni.active');if(a)spawnNavStars(a);});
 </script>
 </body>
 </html>
