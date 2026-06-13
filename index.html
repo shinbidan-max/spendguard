@@ -226,6 +226,8 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .chip-group{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
 .chip{padding:6px 12px;border-radius:99px;font-size:12px;font-weight:500;cursor:pointer;background:rgba(5,10,5,.7);color:var(--text2);border:1px solid var(--border2);transition:all .15s;white-space:nowrap}
 .chip.active{background:rgba(22,163,74,.12);color:var(--cyan);border-color:rgba(22,163,74,.35);box-shadow:0 0 10px rgba(22,163,74,.08)}
+#tti.active,#etti.active{background:#16a34a;color:#ffffff;border-color:#16a34a}
+#tte.active,#ette.active{background:#ef4444;color:#ffffff;border-color:#ef4444}
 
 /* TOGGLE */
 .toggle{position:relative;width:44px;height:26px}
@@ -450,7 +452,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 
 <!-- MODALS -->
 <div class="modal-backdrop" id="matx"><div class="modal"><div class="mh"></div><div class="mt" id="atxt">Add Transaction</div><div class="ms">Record income or expense</div>
-  <div class="chip-group"><div class="chip active" id="tti" onclick="setTxType('income')">💚 Income</div><div class="chip" id="tte" onclick="setTxType('expense')">❤️ Expense</div></div>
+  <div class="chip-group"><div class="chip active" id="tti" onclick="setTxType('income')">Income</div><div class="chip" id="tte" onclick="setTxType('expense')">Expense</div></div>
   <div class="field"><label>Amount (฿)</label><input type="number" id="ta" placeholder="0.00" inputmode="decimal" min="0"></div>
   <div class="field"><label>Description</label><input type="text" id="td" placeholder="What was this for?"></div>
   <div class="field"><label>Category</label><select id="tc"></select></div>
@@ -459,7 +461,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 </div></div>
 
 <div class="modal-backdrop" id="metx"><div class="modal"><div class="mh"></div><div class="mt">Edit Transaction</div><div class="ms">Update this entry</div>
-  <div class="chip-group"><div class="chip active" id="etti" onclick="setETxType('income')">💚 Income</div><div class="chip" id="ette" onclick="setETxType('expense')">❤️ Expense</div></div>
+  <div class="chip-group"><div class="chip active" id="etti" onclick="setETxType('income')">Income</div><div class="chip" id="ette" onclick="setETxType('expense')">Expense</div></div>
   <div class="field"><label>Amount (฿)</label><input type="number" id="eta" inputmode="decimal" min="0"></div>
   <div class="field"><label>Description</label><input type="text" id="etd"></div>
   <div class="field"><label>Category</label><select id="etc"></select></div>
@@ -1112,7 +1114,7 @@ async function saveTx(){
   const a=parseFloat(document.getElementById('ta').value),d=document.getElementById('td').value,c=document.getElementById('tc').value,dt=document.getElementById('tdt').value;
   if(!a||a<=0){toast('Enter a valid amount');return}if(!dt){toast('Select a date');return}
   S.transactions=S.transactions||[];S.transactions.push({id:gid(),type:txType,amount:a,desc:d,category:c,date:dt,createdAt:Date.now()});
-  await save();closeModal('matx');renderAll();toast(txType==='income'?'💚 Income added':'❤️ Expense added');
+  await save();closeModal('matx');renderAll();toast(txType==='income'?'Income added':'Expense added');
 }
 
 // ═══ EDIT TX ═══
