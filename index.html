@@ -88,7 +88,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .bamt{font-family:'Noto Sans Thai',sans-serif;font-size:34px;font-weight:500;letter-spacing:-1px;margin-bottom:3px}
 .bamt .cy{font-size:18px;color:var(--cyan);margin-right:2px;opacity:.8}
 .bprog{width:100%;height:5px;background:rgba(255,255,255,.06);border-radius:99px;margin:12px 0 10px;overflow:hidden}
-.bpb{height:100%;border-radius:99px;background:var(--accent);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.bpb{height:100%;border-radius:99px;background:linear-gradient(90deg,#10FA14,#fbbf24);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
 .bpb.w{background:var(--amber)}
 .bpb.d{background:var(--danger)}
 .bstats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
@@ -96,6 +96,37 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .bsv{font-family:'Noto Sans Thai',sans-serif;font-size:11px;font-weight:700}
 .bsv.g{color:var(--teal)}.bsv.r{color:var(--danger)}.bsv.y{color:var(--amber)}
 
+/* HERO REDESIGN */
+.bh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.bh-controls{display:flex;align-items:center;gap:6px}
+.bh-nav{width:30px;height:30px;border-radius:50%;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);display:flex;align-items:center;justify-content:center;color:var(--cyan);cursor:pointer;transition:all .2s;flex-shrink:0}
+.bh-nav:active{background:rgba(22,163,74,.25)}
+.bh-badge{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.8px;position:relative;cursor:default}
+.bh-badge.safe{background:rgba(22,163,74,.15);color:var(--accent);border:1px solid rgba(22,163,74,.4)}
+.bh-badge.warn{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.4)}
+.bh-badge.danger{background:rgba(248,113,113,.12);color:var(--danger);border:1px solid rgba(248,113,113,.4)}
+.bh-sublabel{font-size:11px;color:var(--text2);margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.bh-dot{width:6px;height:6px;border-radius:50%;background:#10FA14;display:inline-block;flex-shrink:0}
+.bh-rem-lbl{font-size:11px;color:var(--text2);margin-bottom:12px}
+.bh-inner{background:rgba(0,0,0,.35);border:1px solid rgba(22,163,74,.12);border-radius:12px;padding:12px 14px;margin-top:10px}
+.bh-prog-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bh-pbar{flex:1;margin:0;height:8px}
+.bh-pct{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;min-width:56px;text-align:right}
+.bh-info-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.bh-info-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.bh-info-item svg{flex-shrink:0;color:var(--accent);opacity:.8}
+.bh-daily-val{color:var(--teal);font-weight:700}
+.bh-stats-row{display:grid;grid-template-columns:repeat(4,1fr);background:rgba(0,0,0,.35);border:1px solid rgba(22,163,74,.12);border-radius:12px;padding:12px 8px;margin-top:10px;gap:4px}
+.bh-stat{display:flex;flex-direction:column;align-items:center;gap:3px}
+.bh-sicon{width:30px;height:30px;border-radius:8px;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.18);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:3px}
+.bh-si-amber{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.2);color:var(--amber)}
+.bh-si-red{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.2);color:var(--danger)}
+.bh-si-green{background:rgba(16,250,20,.1);border-color:rgba(16,250,20,.2);color:var(--teal)}
+.bh-slbl{font-size:8px;color:var(--text3);text-align:center;line-height:1.3;letter-spacing:.3px;text-transform:uppercase}
+.bh-sval{font-size:11px;font-weight:700;color:var(--text)}
+.bh-sv-amber{color:var(--amber)}
+.bh-sv-red{color:var(--danger)}
+.bh-sv-green{color:var(--teal)}
 /* DAILY CARD */
 .daily-card{background:linear-gradient(135deg,#050505,#080808);border:1px solid rgba(22,163,74,.18);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,.3),inset 0 1px 0 rgba(22,163,74,.06)}
 .dlbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;font-weight:600}
@@ -255,21 +286,36 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
       <button class="btn btn-sm btn-secondary" onclick="startNewMonth()">New Period</button>
     </div>
     <div class="hero-wrap" id="hero-wrap">
-      <div class="hero-nav hl" onclick="shiftPeriod(-1)"><svg width="8" height="12" viewBox="0 0 8 12" fill="none"><path d="M7 1L2 6l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="budget-hero" id="bhero">
-        <div class="bpl" id="hp">—</div>
+        <div class="bh-top">
+          <div class="bpl" id="hp">—</div>
+          <div class="bh-controls">
+            <div class="bh-nav" onclick="shiftPeriod(-1)"><svg width="8" height="12" viewBox="0 0 8 12" fill="none"><path d="M7 1L2 6l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="bh-nav" onclick="shiftPeriod(1)"><svg width="8" height="12" viewBox="0 0 8 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="bh-badge safe" id="hbadge"><svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor" fill-opacity=".25"><path d="M5 1L1 3v4c0 2.2 1.7 4.2 4 4.9 2.3-.7 4-2.7 4-4.9V3L5 1z"/></svg><svg width="10" height="12" viewBox="0 0 10 12" fill="none" style="position:absolute"><path d="M5 1L1 3v4c0 2.2 1.7 4.2 4 4.9 2.3-.7 4-2.7 4-4.9V3L5 1z" stroke="currentColor" stroke-width="1.2"/></svg><span id="hbadge-text">SAFE</span></div>
+          </div>
+        </div>
         <div class="bmo" id="hm">—</div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:3px">Remaining Budget</div>
+        <div class="bh-sublabel" id="bh-sublabel">You can still spend <span class="bh-dot"></span></div>
         <div class="bamt"><span class="cy">฿</span><span id="hr">0</span></div>
-        <div class="bprog"><div class="bpb" id="hpb" style="width:0%"></div></div>
-        <div class="bstats">
-          <div><div class="bsl">Initial</div><div class="bsv">฿<span id="st">0</span></div></div>
-          <div><div class="bsl">Subscr.</div><div class="bsv y">฿<span id="ssub">0</span></div></div>
-          <div><div class="bsl">Spent</div><div class="bsv r">฿<span id="ss">0</span></div></div>
-          <div><div class="bsl">Earned</div><div class="bsv g">฿<span id="se">0</span></div></div>
+        <div class="bh-rem-lbl">Remaining Budget</div>
+        <div class="bh-inner">
+          <div class="bh-prog-row">
+            <div class="bprog bh-pbar"><div class="bpb" id="hpb" style="width:0%"></div></div>
+            <div class="bh-pct" id="hpct">0% used</div>
+          </div>
+          <div class="bh-info-row">
+            <div class="bh-info-item"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1v2M9 1v2M1 5.5h11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span id="hdaysinfo">— days left</span></div>
+            <div class="bh-info-item"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 9l3-3 2.5 2L10 4l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Daily: <span class="bh-daily-val" id="hdaily">฿0</span> / day</span></div>
+          </div>
+        </div>
+        <div class="bh-stats-row">
+          <div class="bh-stat"><div class="bh-sicon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M1 6h12" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="9.5" r="1" fill="currentColor"/></svg></div><div class="bh-slbl">Initial Budget</div><div class="bh-sval">฿<span id="st">0</span></div></div>
+          <div class="bh-stat"><div class="bh-sicon bh-si-amber"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M13 7A6 6 0 1 1 1 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M13 7V3h-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="bh-slbl">Subscription</div><div class="bh-sval bh-sv-amber">฿<span id="ssub">0</span></div></div>
+          <div class="bh-stat"><div class="bh-sicon bh-si-red"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M3 8l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="bh-slbl">Spent</div><div class="bh-sval bh-sv-red">฿<span id="ss">0</span></div></div>
+          <div class="bh-stat"><div class="bh-sicon bh-si-green"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 12V2M3 6l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="bh-slbl">Earned</div><div class="bh-sval bh-sv-green">฿<span id="se">0</span></div></div>
         </div>
       </div>
-      <div class="hero-nav hr" onclick="shiftPeriod(1)"><svg width="8" height="12" viewBox="0 0 8 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px">
         <div class="hdots" id="hdots"></div>
         <div id="today-btn" onclick="goToday()" style="display:none;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--accent);background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.4);border-radius:99px;padding:3px 10px;cursor:pointer">Today</div>
@@ -942,6 +988,9 @@ function renderHome(){
   document.getElementById('ss').textContent=fmtN(exp);
   document.getElementById('se').textContent=fmtN(inc);
   const bar=document.getElementById('hpb');bar.style.width=pct+'%';bar.className='bpb'+(pct>=90?' d':pct>=70?' w':'');
+  const pctEl=document.getElementById('hpct');if(pctEl)pctEl.textContent=Math.round(pct)+'% used';
+  const badge=document.getElementById('hbadge'),badgeText=document.getElementById('hbadge-text');
+  if(badge){const bc=pct>=90?'danger':pct>=70?'warn':'safe';const bl=pct>=90?'DANGER':pct>=70?'WARNING':'SAFE';badge.className='bh-badge '+bc;if(badgeText)badgeText.textContent=bl;}
   document.getElementById('bhero').className='budget-hero'+(status==='future'?' future':status==='past'?' past':' active-period');
   const tcol=document.getElementById('today-col');
   if(status==='current'){
@@ -956,6 +1005,10 @@ function renderHome(){
     document.getElementById('db').textContent=fmtN(todayDB);
     document.getElementById('db').style.color=todayDB<0?'var(--danger)':'';
     document.getElementById('ddl').textContent='Day '+dayNum+' of '+totalDays+' · '+dl+' day'+(dl!==1?'s':'')+' left';
+    const dLeft=daysLeft(p);const daysInfoEl=document.getElementById('hdaysinfo');const dailyEl=document.getElementById('hdaily');
+    if(daysInfoEl)daysInfoEl.textContent=dLeft+' day'+(dLeft!==1?'s':'')+' left in this period';
+    if(dailyEl)dailyEl.textContent='฿'+fmtN(Math.max(0,rem)/Math.max(1,dLeft));
+    const sublabel=document.getElementById('bh-sublabel');if(sublabel)sublabel.style.display='flex';
     tcol.style.display='block';
     document.getElementById('tsp').textContent=fmtN(todaySpent());
     // Base + carry
@@ -992,6 +1045,9 @@ function renderHome(){
     document.getElementById('ddl').textContent='Period ended · '+daysInPeriod(p)+' days';
     tcol.style.display='none';
     const bottomRow=document.getElementById('daily-card-bottom');if(bottomRow)bottomRow.style.display='none';
+    const daysInfoEl2=document.getElementById('hdaysinfo');const dailyEl2=document.getElementById('hdaily');
+    if(daysInfoEl2)daysInfoEl2.textContent='Period ended';if(dailyEl2)dailyEl2.textContent='—';
+    const sublabel2=document.getElementById('bh-sublabel');if(sublabel2){sublabel2.style.display='flex';sublabel2.innerHTML='Budget summary';}
   }
   else{
     ensureBase(p);
@@ -1001,6 +1057,9 @@ function renderHome(){
     document.getElementById('ddl').textContent=daysInPeriod(p)+' days · starts '+p.start;
     tcol.style.display='none';
     const bottomRow=document.getElementById('daily-card-bottom');if(bottomRow)bottomRow.style.display='none';
+    const daysInfoEl3=document.getElementById('hdaysinfo');const dailyEl3=document.getElementById('hdaily');
+    if(daysInfoEl3)daysInfoEl3.textContent='Upcoming period';if(dailyEl3)dailyEl3.textContent='—';
+    const sublabel3=document.getElementById('bh-sublabel');if(sublabel3){sublabel3.style.display='flex';sublabel3.innerHTML='Upcoming budget';}
   }
   const tp=todayPeriod();const meb=document.getElementById('meb');
   if(tp&&tp.id===p.id&&daysLeft(p)===0){meb.classList.add('show');if(rem>0){document.getElementById('be').textContent='🏆';document.getElementById('bt').textContent='Period complete! You saved money!';document.getElementById('bs').textContent=`฿${fmtN(rem)} left · ${(S.streak||0)+1} month streak 🔥`;}else{document.getElementById('be').textContent='📅';document.getElementById('bt').textContent='Period ended';document.getElementById('bs').textContent='Ready for a new period?';}}else meb.classList.remove('show');
