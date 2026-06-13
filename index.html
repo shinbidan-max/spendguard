@@ -1618,7 +1618,7 @@ function famTxListHTML(item, ym, mode){
     ${txList.map(tx=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
       <div>
         <span style="font-family:'Noto Sans Thai',sans-serif;font-size:12px;color:${mode==='expense'?'#f87171':'var(--text2)'}">฿${fmtN(tx.amount)}</span>
-        ${tx.note?`<span style="font-size:11px;color:var(--text3);margin-left:6px">${esc(tx.note)}</span>`:''}
+        ${tx.note?`<span style="font-size:11px;color:#6b7280;margin-left:6px">${esc(tx.note)}</span>`:''}
       </div>
       <div style="display:flex;gap:4px">
         <button class="btn btn-sm btn-secondary" style="padding:2px 8px;font-size:10px" onclick="openFamilyVal('${mode}','${item.id}','${ym}','${tx.id}')">Edit</button>
