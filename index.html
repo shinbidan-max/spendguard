@@ -781,7 +781,11 @@ async function changePwd(){const c=document.getElementById('pc').value,n1=docume
 function askConfirm(title,msg,onOk){document.getElementById('conf-t').textContent=title;document.getElementById('conf-m').textContent=msg;const old=document.getElementById('conf-ok');const nb=old.cloneNode(true);old.parentNode.replaceChild(nb,old);nb.addEventListener('click',()=>{closeModal('mconf');onOk();});openModal('mconf')}
 
 // ═══ NAV ═══
-function spawnNavStars(ni){const ico=ni.querySelector('.ni-ico');if(!ico)return;const offsets=[20,35,50,65,80];const delays=[0,.12,.06,.18,.04];const durs=[.9,1.1,1.0,.85,1.2];offsets.forEach((l,i)=>{const s=document.createElement('span');s.className='nav-star';const icoRect=ico.getBoundingClientRect();const niRect=ni.getBoundingClientRect();const top=icoRect.top-niRect.top+icoRect.height*.3;s.style.cssText=`left:${l}%;top:${top}px;animation-duration:${durs[i]}s;animation-delay:${delays[i]}s`;ni.appendChild(s);s.addEventListener('animationend',()=>s.remove());});}
+let _navStarTimer=null;
+const _starLeftPool=[18,28,38,50,62,72,82];const _starDurPool=[.85,.95,1.05,.9,1.0,.8,1.1];let _starIdx=0;
+function spawnOneNavStar(ni){const ico=ni.querySelector('.ni-ico');if(!ico)return;const s=document.createElement('span');s.className='nav-star';const icoRect=ico.getBoundingClientRect();const niRect=ni.getBoundingClientRect();const top=icoRect.top-niRect.top+icoRect.height*.25;const l=_starLeftPool[_starIdx%_starLeftPool.length];const dur=_starDurPool[_starIdx%_starDurPool.length];_starIdx++;s.style.cssText=`left:${l}%;top:${top}px;animation-duration:${dur}s`;ni.appendChild(s);s.addEventListener('animationend',()=>s.remove());}
+function startNavStars(ni){spawnOneNavStar(ni);if(_navStarTimer)clearInterval(_navStarTimer);_navStarTimer=setInterval(()=>{const active=document.querySelector('.ni.active');if(active)spawnOneNavStar(active);},380);}
+function spawnNavStars(ni){startNavStars(ni);}
 function showPage(n){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
