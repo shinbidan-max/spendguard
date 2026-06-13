@@ -87,7 +87,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .bmo{font-family:'Noto Sans Thai',sans-serif;font-size:19px;font-weight:700;margin-bottom:14px;letter-spacing:-.3px;color:#ffffff}
 
 .bamt{font-family:'Noto Sans Thai',sans-serif;font-size:34px;font-weight:500;letter-spacing:-1px;margin-bottom:3px;color:#ffffff}
-.bamt .cy{font-size:18px;color:var(--cyan);margin-right:2px;opacity:.8}
+.bamt .cy{font-size:18px;color:#ffffff;margin-right:2px;opacity:.8}
 .bprog{width:100%;height:5px;background:rgba(255,255,255,.06);border-radius:99px;margin:12px 0 10px;overflow:hidden}
 .bpb{height:100%;border-radius:99px;background:linear-gradient(90deg,#10FA14,#fbbf24);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
 .bpb.w{background:var(--amber)}
@@ -1018,7 +1018,7 @@ function renderHome(){
     const totalDays=daysInPeriod(p);
     document.getElementById('dlbl').textContent="Today's Budget";
     document.getElementById('db').textContent=fmtN(todayDB);
-    document.getElementById('db').style.color=todayDB<0?'var(--danger)':'';
+    document.getElementById('db').parentElement.style.color=todayDB<0?'var(--danger)':'var(--teal)';
     document.getElementById('ddl').textContent='Day '+dayNum+' of '+totalDays+' · '+dl+' day'+(dl!==1?'s':'')+' left';
     const dLeft=daysLeft(p);const daysInfoEl=document.getElementById('hdaysinfo');const dailyEl=document.getElementById('hdaily');
     if(daysInfoEl)daysInfoEl.textContent=dLeft+' day'+(dLeft!==1?'s':'')+' left in this period';
@@ -1056,7 +1056,7 @@ function renderHome(){
   else if(status==='past'){
     document.getElementById('dlbl').textContent='Savings';
     document.getElementById('db').textContent=fmtN(Math.max(0,rem));
-    document.getElementById('db').style.color='';
+    document.getElementById('db').parentElement.style.color='var(--teal)';
     document.getElementById('ddl').textContent='Period ended · '+daysInPeriod(p)+' days';
     tcol.style.display='none';
     const bottomRow=document.getElementById('daily-card-bottom');if(bottomRow)bottomRow.style.display='none';
@@ -1068,7 +1068,7 @@ function renderHome(){
     ensureBase(p);
     document.getElementById('dlbl').textContent='Projected Daily';
     document.getElementById('db').textContent=fmtN(Math.max(0,p.baseDailyBudget||netBudget(p)/Math.max(1,daysInPeriod(p))));
-    document.getElementById('db').style.color='';
+    document.getElementById('db').parentElement.style.color='var(--teal)';
     document.getElementById('ddl').textContent=daysInPeriod(p)+' days · starts '+p.start;
     tcol.style.display='none';
     const bottomRow=document.getElementById('daily-card-bottom');if(bottomRow)bottomRow.style.display='none';
