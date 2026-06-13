@@ -81,8 +81,8 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .hdots{display:flex;justify-content:center;gap:5px;margin-top:8px}
 .hdot{width:5px;height:5px;border-radius:50%;background:var(--surface3);transition:all .3s}
 .hdot.active{background:var(--cyan);width:16px;border-radius:3px;box-shadow:0 0 6px var(--cyan-glow)}
-@keyframes aurora-shift{0%{background-position:0% 0%}25%{background-position:100% 0%}50%{background-position:100% 100%}75%{background-position:0% 100%}100%{background-position:0% 0%}}
-.budget-hero{background:linear-gradient(135deg,#10FA14 0%,#00ff44 12%,#026b05 30%,#000000 50%,#0d8c0f 68%,#10FA14 85%,#00cc33 100%);background-size:300% 300%;animation:aurora-shift 5s ease-in-out infinite;border:1px solid rgba(16,250,20,.35);border-radius:24px;padding:22px 20px 18px;position:relative;overflow:hidden;user-select:none}
+@keyframes aurora-shift{0%{background-position:0% 30%}50%{background-position:100% 70%}100%{background-position:0% 30%}}
+.budget-hero{background:linear-gradient(145deg,#10FA14 0%,#05c409 30%,#0aaa0d 55%,#042e04 80%,#021602 100%);background-size:220% 220%;animation:aurora-shift 5s ease-in-out infinite;border:1px solid rgba(16,250,20,.35);border-radius:24px;padding:22px 20px 18px;position:relative;overflow:hidden;user-select:none}
 .budget-hero.active-period{border-color:rgba(22,163,74,.45)}
 .budget-hero.future{border-color:rgba(251,191,36,.3)}
 .budget-hero.past{border-color:rgba(20,50,20,.3);opacity:.85}
