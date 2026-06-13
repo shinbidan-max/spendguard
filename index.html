@@ -2185,7 +2185,7 @@ function renderAll(){
   const rp=document.getElementById('page-reports');if(rp&&rp.classList.contains('active')){populateRPeriodSel();renderReports();}
 }
 
-init();
+init().then(()=>{const activeNi=document.querySelector('.ni.active');if(activeNi)startNavStars(activeNi);});
 </script>
 </body>
 </html>
