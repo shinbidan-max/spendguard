@@ -112,14 +112,17 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .bh-sublabel{font-size:11px;color:rgba(0,0,0,.65);margin-bottom:2px;display:flex;align-items:center;gap:6px}
 .bh-dot{width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,.5);display:inline-block;flex-shrink:0}
 .bh-rem-lbl{font-size:11px;color:rgba(0,0,0,.80);margin-bottom:12px}
-.bh-inner{background:rgba(0,0,0,.85);border:1px solid rgba(0,0,0,.5);border-top-color:rgba(0,0,0,.8);border-radius:12px;padding:12px 14px;margin-top:10px;box-shadow:inset 0 2px 8px rgba(0,0,0,.7),inset 0 4px 20px rgba(0,0,0,.5)}
-.bh-prog-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.bh-pbar{flex:1;margin:0;height:8px}
-.bh-pct{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;min-width:56px;text-align:right}
-.bh-info-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.bh-info-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
-.bh-info-item svg{flex-shrink:0;color:var(--accent);opacity:.8}
-.bh-daily-val{color:var(--teal);font-weight:700}
+.bh-ring-wrap{position:absolute;right:16px;top:52px;width:82px;height:82px;display:flex;align-items:center;justify-content:center}
+.bh-ring-svg{width:82px;height:82px;transform:rotate(-90deg)}
+.bh-ring-track{fill:none;stroke:rgba(0,0,0,.28);stroke-width:8}
+.bh-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:207.35;stroke-dashoffset:207.35;transition:stroke-dashoffset .6s ease,stroke .3s}
+.bh-ring-inner{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.bh-ring-pct{font-size:15px;font-weight:800;color:#ffffff;line-height:1}
+.bh-ring-used{font-size:7px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.5px}
+.bh-info-bar{display:flex;align-items:center;gap:12px;margin-top:6px}
+.bh-info-item{display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(0,0,0,.65)}
+.bh-info-item svg{flex-shrink:0;color:rgba(0,0,0,.5);opacity:.9}
+.bh-daily-val{color:rgba(0,0,0,.75);font-weight:700}
 .bh-stats-row{display:grid;grid-template-columns:repeat(4,1fr);background:rgba(0,0,0,.85);border:1px solid rgba(0,0,0,.5);border-top-color:rgba(0,0,0,.8);border-radius:12px;padding:12px 8px;margin-top:10px;gap:4px;box-shadow:inset 0 2px 8px rgba(0,0,0,.7),inset 0 4px 20px rgba(0,0,0,.5)}
 .bh-stat{display:flex;flex-direction:column;align-items:center;gap:3px}
 .bh-sicon{width:40px;height:40px;border-radius:10px;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.18);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:3px}
@@ -315,19 +318,17 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
             <div class="bh-badge safe" id="hbadge"><svg width="10" height="12" viewBox="0 0 10 12" fill="currentColor" fill-opacity=".25"><path d="M5 1L1 3v4c0 2.2 1.7 4.2 4 4.9 2.3-.7 4-2.7 4-4.9V3L5 1z"/></svg><svg width="10" height="12" viewBox="0 0 10 12" fill="none" style="position:absolute"><path d="M5 1L1 3v4c0 2.2 1.7 4.2 4 4.9 2.3-.7 4-2.7 4-4.9V3L5 1z" stroke="currentColor" stroke-width="1.2"/></svg><span id="hbadge-text">SAFE</span></div>
           </div>
         </div>
+        <div class="bh-ring-wrap">
+          <svg class="bh-ring-svg" viewBox="0 0 82 82"><circle class="bh-ring-track" cx="41" cy="41" r="33"/><circle class="bh-ring-fill" id="hring" cx="41" cy="41" r="33"/></svg>
+          <div class="bh-ring-inner"><div class="bh-ring-pct" id="hpct">0%</div><div class="bh-ring-used">used</div></div>
+        </div>
         <div class="bmo" id="hm">—</div>
         <div class="bh-sublabel" id="bh-sublabel">You can still spend <span class="bh-dot"></span></div>
         <div class="bamt"><span class="cy">฿</span><span id="hr">0</span></div>
         <div class="bh-rem-lbl">Remaining Budget</div>
-        <div class="bh-inner">
-          <div class="bh-prog-row">
-            <div class="bprog bh-pbar"><div class="bpb" id="hpb" style="width:0%"></div></div>
-            <div class="bh-pct" id="hpct">0% used</div>
-          </div>
-          <div class="bh-info-row">
-            <div class="bh-info-item"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1v2M9 1v2M1 5.5h11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span id="hdaysinfo">— days left</span></div>
-            <div class="bh-info-item"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 9l3-3 2.5 2L10 4l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Daily: <span class="bh-daily-val" id="hdaily">฿0</span> / day</span></div>
-          </div>
+        <div class="bh-info-bar">
+          <div class="bh-info-item"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1v2M9 1v2M1 5.5h11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span id="hdaysinfo">— days left</span></div>
+          <div class="bh-info-item"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 9l3-3 2.5 2L10 4l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Daily: <span class="bh-daily-val" id="hdaily">฿0</span> / day</span></div>
         </div>
         <div class="bh-stats-row">
           <div class="bh-stat"><div class="bh-sicon"><svg width="18" height="18" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M1 6h12" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="9.5" r="1" fill="currentColor"/></svg></div><div class="bh-slbl">Initial Budget</div><div class="bh-sval">฿<span id="st">0</span></div></div>
@@ -1009,8 +1010,9 @@ function renderHome(){
   document.getElementById('ssub').textContent=fmtN(subs);
   document.getElementById('ss').textContent=fmtN(exp);
   document.getElementById('se').textContent=fmtN(inc);
-  const bar=document.getElementById('hpb');bar.style.width=pct+'%';bar.className='bpb'+(pct>=90?' d':pct>=70?' w':'');
-  const pctEl=document.getElementById('hpct');if(pctEl)pctEl.textContent=Math.round(pct)+'% used';
+  const ring=document.getElementById('hring');const pctEl=document.getElementById('hpct');
+  if(ring){const circ=207.35;ring.style.strokeDashoffset=(circ*(1-Math.min(pct,100)/100)).toFixed(2);ring.style.stroke=pct>=90?'#f87171':pct>=70?'#fbbf24':'#10FA14';}
+  if(pctEl)pctEl.textContent=Math.round(pct)+'%';
   const badge=document.getElementById('hbadge'),badgeText=document.getElementById('hbadge-text');
   if(badge){const bc=pct>=90?'danger':pct>=70?'warn':'safe';const bl=pct>=90?'DANGER':pct>=70?'WARNING':'SAFE';badge.className='bh-badge '+bc;if(badgeText)badgeText.textContent=bl;}
   document.getElementById('bhero').className='budget-hero'+(status==='future'?' future':status==='past'?' past':' active-period');
