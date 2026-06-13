@@ -116,7 +116,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .bh-ring-wrap{position:absolute;right:16px;top:68px;width:82px;height:82px;display:flex;align-items:center;justify-content:center}
 .bh-ring-svg{width:82px;height:82px;transform:rotate(-90deg)}
 .bh-ring-track{fill:none;stroke:rgba(0,0,0,.28);stroke-width:12}
-.bh-ring-fill{fill:none;stroke-width:12;stroke-linecap:round;stroke-dasharray:207.35;stroke-dashoffset:207.35;transition:stroke-dashoffset .6s ease,stroke .3s}
+.bh-ring-fill{fill:none;stroke-width:12;stroke-linecap:round;stroke-dasharray:207.35;stroke-dashoffset:207.35;transition:stroke-dashoffset 1.4s cubic-bezier(.25,.46,.45,.94),stroke .3s}
 .bh-ring-inner{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
 .bh-ring-pct{font-size:15px;font-weight:800;color:#ffffff;line-height:1}
 .bh-ring-used{font-size:7px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.5px}
@@ -1013,7 +1013,7 @@ function renderHome(){
   document.getElementById('ss').textContent=fmtN(exp);
   document.getElementById('se').textContent=fmtN(inc);
   const ring=document.getElementById('hring');const pctEl=document.getElementById('hpct');
-  if(ring){const circ=207.35;ring.style.strokeDashoffset=(circ*(1-Math.min(pct,100)/100)).toFixed(2);ring.style.stroke=pct>=90?'#f87171':pct>=70?'#fbbf24':'#10FA14';}
+  if(ring){const circ=207.35;const targetOff=(circ*(1-Math.min(pct,100)/100)).toFixed(2);ring.style.stroke=pct>=90?'#f87171':pct>=70?'#fbbf24':'#10FA14';ring.style.strokeDashoffset=circ;requestAnimationFrame(()=>requestAnimationFrame(()=>{ring.style.strokeDashoffset=targetOff;}));}
   if(pctEl)pctEl.textContent=Math.round(pct)+'%';
   const badge=document.getElementById('hbadge'),badgeText=document.getElementById('hbadge-text');
   if(badge){const bc=pct>=90?'danger':pct>=70?'warn':'safe';const bl=pct>=90?'DANGER':pct>=70?'WARNING':'SAFE';badge.className='bh-badge '+bc;if(badgeText)badgeText.textContent=bl;}
