@@ -1250,7 +1250,7 @@ function renderOvDetail(){
   else{const subs=subsForPeriod(p);const txs=pTxs(p).filter(t=>t.type==='expense').sort((a,b)=>b.date.localeCompare(a.date));el.innerHTML=`<div class="sh" style="margin-top:16px"><div class="stitle">Expense Transactions</div></div>`+subs.map(subPinnedHTML).join('')+(txs.length?txs.map(txHTML).join(''):'');}
 }
 
-const COLORS=['rgba(16,250,20,.85)','rgba(248,113,113,.85)','rgba(16,250,20,.85)','rgba(251,191,36,.85)','rgba(139,92,246,.85)','rgba(251,146,60,.85)','rgba(34,211,238,.85)','rgba(163,230,53,.85)'];
+const COLORS=['#10FA14','#f87171','#fbbf24','#818cf8','#fb923c','#22d3ee','#e879f9','#f472b6','#34d399','#facc15','#60a5fa','#a78bfa'];
 
 function renderCats(con){
   const p=getRPeriod();const byC={};
