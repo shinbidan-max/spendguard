@@ -1344,7 +1344,7 @@ function drawCompare(){
     type:'bar',
     data:{labels,datasets:ds},
     options:{
-      animation:false,
+      animation:{duration:800,easing:'easeOutQuart',y:{from:(ctx)=>ctx.chart.scales.y.getPixelForValue(0)}},
       responsive:true,
       maintainAspectRatio:false,
       layout:{padding:{top:24}},
@@ -1673,6 +1673,7 @@ function openFamilySavings(){
       }]
     },
     options:{
+      animation:{duration:800,easing:'easeOutQuart',y:{from:(ctx)=>ctx.chart.scales.y.getPixelForValue(0)}},
       responsive:true,maintainAspectRatio:false,
       plugins:{
         legend:{display:false},
@@ -1784,6 +1785,7 @@ function openFamilyTrend(mode, itemId){
     type:'bar',
     data:{labels,datasets},
     options:{
+      animation:{duration:800,easing:'easeOutQuart',y:{from:(ctx)=>ctx.chart.scales.y.getPixelForValue(0)}},
       responsive:true, maintainAspectRatio:false,
       plugins:{
         legend:{labels:{color:'#4a7a4a',font:{size:10},usePointStyle:true,pointStyle:'circle',boxWidth:8}},
