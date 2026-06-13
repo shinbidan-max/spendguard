@@ -403,7 +403,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
     <!-- Month selector -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div class="hero-nav hl" style="position:static;transform:none" onclick="shiftFamilyMonth(-1)"><svg width="8" height="12" viewBox="0 0 8 12" fill="none"><path d="M7 1L2 6l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div style="font-family:'Noto Sans Thai',sans-serif;font-size:16px;font-weight:700" id="family-month-label">—</div>
+      <div style="font-family:'Noto Sans Thai',sans-serif;font-size:16px;font-weight:700;color:#ffffff" id="family-month-label">—</div>
       <div class="hero-nav hr" style="position:static;transform:none" onclick="shiftFamilyMonth(1)"><svg width="8" height="12" viewBox="0 0 8 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
@@ -1966,7 +1966,7 @@ function renderFamilyDetail(){
             <div style="display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="display:flex;align-items:center;gap:8px">
-                  <span style="font-size:14px;font-weight:600;cursor:pointer;color:var(--text)" onclick="openFamilyTrend('revenue','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
+                  <span style="font-size:14px;font-weight:600;cursor:pointer;color:#ffffff" onclick="openFamilyTrend('revenue','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
                   <button class="btn btn-sm btn-secondary" style="padding:2px 6px;font-size:10px" onclick="openFamilyItem('revenue','${item.id}')">Edit</button>
                 </div>
                 <div style="font-size:11px;color:var(--text3);margin-top:2px">Plan ฿${fmtN(budget)}/mo ${hasActual?diffBadge(actual,budget,true):''}</div>
@@ -1999,7 +1999,7 @@ function renderFamilyDetail(){
             <div style="display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="display:flex;align-items:center;gap:8px">
-                  <span style="font-size:14px;font-weight:600;cursor:pointer;color:var(--text)" onclick="openFamilyTrend('expense','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
+                  <span style="font-size:14px;font-weight:600;cursor:pointer;color:#ffffff" onclick="openFamilyTrend('expense','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
                   <button class="btn btn-sm btn-secondary" style="padding:2px 6px;font-size:10px" onclick="openFamilyItem('expense','${item.id}')">Edit</button>
                 </div>
                 <div style="font-size:11px;color:var(--text3);margin-top:2px">Plan ฿${fmtN(budget)}/mo ${hasActual?diffBadge(actual,budget,false):''}</div>
@@ -2027,7 +2027,7 @@ function renderFamilyDetail(){
             <div style="display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="display:flex;align-items:center;gap:8px">
-                  <span style="font-size:14px;font-weight:600;cursor:pointer;color:var(--text)" onclick="openFamilyTrend('annual','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
+                  <span style="font-size:14px;font-weight:600;cursor:pointer;color:#ffffff" onclick="openFamilyTrend('annual','${item.id}')">${esc(item.name)} <span style="font-size:10px;color:var(--cyan);opacity:.7">↗</span></span>
                   <button class="btn btn-sm btn-secondary" style="padding:2px 6px;font-size:10px" onclick="openFamilyItem('annual','${item.id}')">Edit</button>
                 </div>
                 <div style="font-size:11px;color:${over?'var(--danger)':'var(--text3)'};margin-top:2px">
