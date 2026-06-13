@@ -217,6 +217,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 .cc-leg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(22,163,74,.1)}
 .cc-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#9ca3af;cursor:pointer}
 .cc-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cc-pill{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08);border-radius:99px;padding:6px 12px;font-size:12px;color:#9ca3af;white-space:nowrap;flex-shrink:0}
 .rp-sel{display:flex;align-items:center;gap:8px;margin-bottom:16px;background:rgba(5,10,5,.7);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px}
 .rp-sel select{flex:1;background:transparent;border:none;color:var(--text);font-family:'Noto Sans Thai',sans-serif;font-size:13px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer}
 
@@ -1292,30 +1293,36 @@ function renderCatDetail(cd){const el=document.getElementById('catd');if(!el)ret
 
 function renderCompare(con){
   const expCats=(S.categories||[]).filter(c=>c.type==='expense');
-  con.innerHTML=`<div class="rperiod">Last 6 periods · newest on right</div>
-  <div style="margin-bottom:16px"><div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Category</div>
-  <div class="chip-group" id="ccc"><div class="chip active" onclick="setCCat(this,null)">All expenses</div>${expCats.map(c=>`<div class="chip" onclick="setCCat(this,'${c.id}')">${c.name}</div>`).join('')}</div></div>
-  <div class="chart-wrap" style="height:260px"><canvas id="ccomp"></canvas></div>
+  con.innerHTML=`<div class="cc-card">
+    <div class="cc-hd">
+      <div class="cc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+      <div style="flex:1"><div class="cc-ttl">Expense Comparison</div><div class="cc-sub">Last 6 periods · newest on right</div></div>
+      <div class="cc-pill" id="comp-pill"><span class="cc-leg-dot" style="background:#f87171"></span>Expense</div>
+    </div>
+    <div style="margin-bottom:16px"><div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Category</div>
+    <div class="chip-group" id="ccc"><div class="chip active" onclick="setCCat(this,null)">All expenses</div>${expCats.map(c=>`<div class="chip" onclick="setCCat(this,'${c.id}')">${c.name}</div>`).join('')}</div></div>
+    <div style="height:260px"><canvas id="ccomp"></canvas></div>
+  </div>
   <div id="compd"></div>`;
   cCatId=null;window._cType='expense';setTimeout(drawCompare,50);
 }
 function setCType(el){document.querySelectorAll('#ctc .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');window._cType=el.dataset.ct;cCatId=null;document.querySelectorAll('#ccc .chip').forEach(c=>c.classList.remove('active'));document.querySelector('#ccc .chip').classList.add('active');document.getElementById('compd').innerHTML='';drawCompare();}
-function setCCat(el,id){document.querySelectorAll('#ccc .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');cCatId=id;if(id){window._cType=null;document.querySelectorAll('#ctc .chip').forEach(c=>c.classList.remove('active'));}document.getElementById('compd').innerHTML='';drawCompare();}
+function setCCat(el,id){document.querySelectorAll('#ccc .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');cCatId=id;const pill=document.getElementById('comp-pill');if(pill){const cat=id?getCat(id):null;pill.innerHTML=cat?`<span class="cc-leg-dot" style="background:#fbbf24"></span>${cat.name}`:`<span class="cc-leg-dot" style="background:#f87171"></span>Expense`;}document.getElementById('compd').innerHTML='';drawCompare();}
 function drawCompare(){
   const allSorted=sortedPeriods();const apIdx=allSorted.findIndex(p=>p.id===getActive()?.id);const end=apIdx>=0?apIdx:allSorted.length-1;const start=Math.max(0,end-5);const realPeriods=allSorted.slice(start,end+1);
   const slots=[];for(let i=0;i<6;i++){const ri=i-(5-(realPeriods.length-1));slots.push(ri>=0&&ri<realPeriods.length?realPeriods[ri]:null);}
   const ctx=document.getElementById('ccomp');if(!ctx)return;if(rChart){rChart.destroy();rChart=null;}
-  const labels=slots.map((p,i)=>p?periodName(p).split(' ')[0]:`P${i+1}`);const ctype=window._cType||'both';
-  function sv(p,t){if(!p)return 0;if(t==='income')return pInc(p);if(t==='cat'){const sa=subsForPeriod(p).filter(s=>s.category===cCatId).reduce((s,x)=>s+parseFloat(x.amount),0);return pTxs(p).filter(t=>t.type==='expense'&&t.category===cCatId).reduce((s,t)=>s+t.amount,0)+sa;}return pExp(p)+subsPeriod(p);}
+  const labels=slots.map((p,i)=>p?periodName(p).split(' ')[0]:`P${i+1}`);
+  function sv(p,t){if(!p)return 0;if(t==='cat'){const sa=subsForPeriod(p).filter(s=>s.category===cCatId).reduce((s,x)=>s+parseFloat(x.amount),0);return pTxs(p).filter(t=>t.type==='expense'&&t.category===cCatId).reduce((s,t)=>s+t.amount,0)+sa;}return pExp(p)+subsPeriod(p);}
+  const fmtK=n=>n>0?'฿'+parseFloat(n).toLocaleString('en',{maximumFractionDigits:0}):'';
+  const eC=cCatId?'rgba(251,191,36,.45)':'rgba(248,113,113,.45)';
+  const eB=cCatId?'rgba(251,191,36,.9)':'rgba(248,113,113,.85)';
+  const eE=cCatId?'rgba(251,191,36,.05)':'rgba(248,113,113,.05)';
+  const lC=cCatId?'#fbbf24':'#f87171';
   let ds=[];
-  if(cCatId){const cat=getCat(cCatId);ds=[{label:cat?cat.name:'Category',data:slots.map(p=>sv(p,'cat')),backgroundColor:slots.map(p=>p?'rgba(251,191,36,.25)':'rgba(251,191,36,.06)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(251,191,36,.6)':'transparent'),borderWidth:1}];}
-  else if(ctype==='both')ds=[
-    {label:'Income',data:slots.map(p=>sv(p,'income')),backgroundColor:slots.map(p=>p?'rgba(16,250,20,.2)':'rgba(16,250,20,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(16,250,20,.5)':'transparent'),borderWidth:1},
-    {label:'Expense',data:slots.map(p=>sv(p,'expense')),backgroundColor:slots.map(p=>p?'rgba(248,113,113,.2)':'rgba(248,113,113,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(248,113,113,.5)':'transparent'),borderWidth:1}
-  ];
-  else if(ctype==='income')ds=[{label:'Income',data:slots.map(p=>sv(p,'income')),backgroundColor:slots.map(p=>p?'rgba(16,250,20,.2)':'rgba(16,250,20,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(16,250,20,.5)':'transparent'),borderWidth:1}];
-  else ds=[{label:'Expense',data:slots.map(p=>sv(p,'expense')),backgroundColor:slots.map(p=>p?'rgba(248,113,113,.2)':'rgba(248,113,113,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(248,113,113,.5)':'transparent'),borderWidth:1}];
-
+  if(cCatId){const cat=getCat(cCatId);ds=[{label:cat?cat.name:'Category',data:slots.map(p=>sv(p,'cat')),backgroundColor:slots.map(p=>p?eC:eE),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?eB:'transparent'),borderWidth:1.5}];}
+  else ds=[{label:'Expense',data:slots.map(p=>sv(p,'expense')),backgroundColor:slots.map(p=>p?eC:eE),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?eB:'transparent'),borderWidth:1.5}];
+  const labelsPlugin={id:'compLabels',afterDatasetsDraw(chart){const{ctx:c2}=chart;chart.data.datasets.forEach((ds2,di)=>{const meta=chart.getDatasetMeta(di);meta.data.forEach((bar,bi)=>{const val=ds2.data[bi];if(!val||val<=0)return;const{x,y}=bar.getProps(['x','y']);c2.save();c2.fillStyle=lC;c2.font='600 10px "Noto Sans Thai",sans-serif';c2.textAlign='center';c2.textBaseline='bottom';c2.fillText(fmtK(val),x,y-4);c2.restore();});});}};
   rChart=new Chart(ctx,{
     type:'bar',
     data:{labels,datasets:ds},
@@ -1324,21 +1331,26 @@ function drawCompare(){
       responsive:true,
       maintainAspectRatio:false,
       plugins:{
-        legend:{labels:{color:'#4a7a4a',font:{size:11},usePointStyle:true,pointStyle:'circle',boxWidth:8}},
-        tooltip:{backgroundColor:'rgba(3,6,3,.95)',borderColor:'rgba(16,250,20,.3)',borderWidth:1,titleColor:'#e0ffe0',bodyColor:'#4a7a4a',padding:10,callbacks:{label:c=>` ฿${fmtN(c.parsed.y)}`}}
+        legend:{display:false},
+        tooltip:{backgroundColor:'rgba(3,6,3,.95)',borderColor:'rgba(16,250,20,.3)',borderWidth:1,titleColor:'#ffffff',bodyColor:'#9ca3af',padding:10,callbacks:{label:c=>` ฿${fmtN(c.parsed.y)}`}}
       },
       scales:{
-        x:{ticks:{color:'#4a7a4a',font:{size:10}},grid:{display:false},border:{color:'rgba(16,250,20,.1)'}},
-        y:{ticks:{color:'#4a7a4a',font:{size:10},callback:v=>'฿'+fmtN(v)},grid:{color:'rgba(16,250,20,.1)',lineWidth:1},border:{color:'rgba(16,250,20,.1)',dash:[4,4]}}
+        x:{ticks:{color:'#6b7280',font:{size:10}},grid:{display:false},border:{color:'rgba(22,163,74,.15)'}},
+        y:{
+          title:{display:true,text:'Amount (฿)',color:'#16a34a',font:{size:11,weight:'600'}},
+          ticks:{color:'#6b7280',font:{size:10},callback:v=>'฿'+parseFloat(v).toLocaleString('en',{maximumFractionDigits:0})},
+          grid:{color:'rgba(22,163,74,.08)',lineWidth:1,borderDash:[4,4]},
+          border:{color:'rgba(22,163,74,.15)',dash:[4,4]}
+        }
       },
       onClick:(e,els)=>{
         if(!els.length){document.getElementById('compd').innerHTML='';return;}
-        const idx=els[0].index;
-        const clickedP=slots[idx];
+        const idx=els[0].index;const clickedP=slots[idx];
         if(clickedP)renderComparePeriodDetail(clickedP);
         else document.getElementById('compd').innerHTML='<div class="empty"><div class="empty-sub">No data for this slot</div></div>';
       }
-    }
+    },
+    plugins:[labelsPlugin]
   });
 }
 function renderComparePeriodDetail(p){const el=document.getElementById('compd');if(!el)return;const cat=cCatId?getCat(cCatId):null;const ctype=window._cType;let txs,subs=[];if(cCatId){subs=subsForPeriod(p).filter(s=>s.category===cCatId);txs=pTxs(p).filter(t=>t.category===cCatId).sort((a,b)=>b.date.localeCompare(a.date));}else{const type=ctype==='income'?'income':'expense';subs=type==='expense'?subsForPeriod(p):[];txs=pTxs(p).filter(t=>t.type===type).sort((a,b)=>b.date.localeCompare(a.date));}el.innerHTML=`<div class="sh" style="margin-top:16px"><div class="stitle">${periodName(p)}${cat?' · '+cat.name:''}</div></div>`+subs.map(subPinnedHTML).join('')+(txs.length?txs.map(txHTML).join(''):'<div class="empty"><div class="empty-sub">No transactions</div></div>');}
