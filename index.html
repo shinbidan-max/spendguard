@@ -1290,7 +1290,7 @@ function renderCats(con){
     });
     ctx.shadowBlur=0;ctx.restore();
   }
-},{id:'tl',afterDatasetDraw(chart){const{ctx:cx,data}=chart;const ds=data.datasets[0];const meta=chart.getDatasetMeta(0);const total=ds.data.reduce((a,b)=>a+b,0);meta.data.forEach((arc,i)=>{if(!top3.includes(cd[i].id))return;const pct=ds.data[i]/total;if(pct<0.05)return;const ang=(arc.startAngle+arc.endAngle)/2,r=(arc.outerRadius+arc.innerRadius)/2;const x=arc.x+Math.cos(ang)*r,y=arc.y+Math.sin(ang)*r;const lbl='฿'+fmtN(ds.data[i]);cx.save();cx.font='bold 10px sans-serif';const w=cx.measureText(lbl).width+10;cx.fillStyle='rgba(0,0,0,.65)';cx.beginPath();if(cx.roundRect)cx.roundRect(x-w/2,y-9,w,18,4);else cx.rect(x-w/2,y-9,w,18);cx.fill();cx.fillStyle='#fff';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(lbl,x,y);cx.restore();});}}]});
+}]});
     renderCatDetail(cd);
   },50);
 }
