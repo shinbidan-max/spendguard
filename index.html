@@ -1290,7 +1290,7 @@ function renderCompare(con){
   <div style="margin-bottom:10px"><div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">View</div>
   <div class="chip-group" id="ctc"><div class="chip active" data-ct="both" onclick="setCType(this)">Income vs Expense</div><div class="chip" data-ct="income" onclick="setCType(this)">Income only</div><div class="chip" data-ct="expense" onclick="setCType(this)">Expense only</div></div></div>
   <div style="margin-bottom:16px"><div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Or by category</div>
-  <div class="chip-group" id="ccc"><div class="chip active" onclick="setCCat(this,null)">All expenses</div>${expCats.map(c=>`<div class="chip" onclick="setCCat(this,'${c.id}')">${c.icon} ${c.name}</div>`).join('')}</div></div>
+  <div class="chip-group" id="ccc"><div class="chip active" onclick="setCCat(this,null)">All expenses</div>${expCats.map(c=>`<div class="chip" onclick="setCCat(this,'${c.id}')">${c.name}</div>`).join('')}</div></div>
   <div class="chart-wrap" style="height:260px"><canvas id="ccomp"></canvas></div>
   <div id="compd"></div>`;
   cCatId=null;window._cType='both';setTimeout(drawCompare,50);
@@ -1304,7 +1304,7 @@ function drawCompare(){
   const labels=slots.map((p,i)=>p?periodName(p).split(' ')[0]:`P${i+1}`);const ctype=window._cType||'both';
   function sv(p,t){if(!p)return 0;if(t==='income')return pInc(p);if(t==='cat'){const sa=subsForPeriod(p).filter(s=>s.category===cCatId).reduce((s,x)=>s+parseFloat(x.amount),0);return pTxs(p).filter(t=>t.type==='expense'&&t.category===cCatId).reduce((s,t)=>s+t.amount,0)+sa;}return pExp(p)+subsPeriod(p);}
   let ds=[];
-  if(cCatId){const cat=getCat(cCatId);ds=[{label:cat?cat.icon+' '+cat.name:'Category',data:slots.map(p=>sv(p,'cat')),backgroundColor:slots.map(p=>p?'rgba(251,191,36,.25)':'rgba(251,191,36,.06)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(251,191,36,.6)':'transparent'),borderWidth:1}];}
+  if(cCatId){const cat=getCat(cCatId);ds=[{label:cat?cat.name:'Category',data:slots.map(p=>sv(p,'cat')),backgroundColor:slots.map(p=>p?'rgba(251,191,36,.25)':'rgba(251,191,36,.06)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(251,191,36,.6)':'transparent'),borderWidth:1}];}
   else if(ctype==='both')ds=[
     {label:'Income',data:slots.map(p=>sv(p,'income')),backgroundColor:slots.map(p=>p?'rgba(16,250,20,.2)':'rgba(16,250,20,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(16,250,20,.5)':'transparent'),borderWidth:1},
     {label:'Expense',data:slots.map(p=>sv(p,'expense')),backgroundColor:slots.map(p=>p?'rgba(248,113,113,.2)':'rgba(248,113,113,.05)'),borderRadius:6,borderSkipped:false,borderColor:slots.map(p=>p?'rgba(248,113,113,.5)':'transparent'),borderWidth:1}
@@ -1337,7 +1337,7 @@ function drawCompare(){
     }
   });
 }
-function renderComparePeriodDetail(p){const el=document.getElementById('compd');if(!el)return;const cat=cCatId?getCat(cCatId):null;const ctype=window._cType;let txs,subs=[];if(cCatId){subs=subsForPeriod(p).filter(s=>s.category===cCatId);txs=pTxs(p).filter(t=>t.category===cCatId).sort((a,b)=>b.date.localeCompare(a.date));}else{const type=ctype==='income'?'income':'expense';subs=type==='expense'?subsForPeriod(p):[];txs=pTxs(p).filter(t=>t.type===type).sort((a,b)=>b.date.localeCompare(a.date));}el.innerHTML=`<div class="sh" style="margin-top:16px"><div class="stitle">${periodName(p)}${cat?' · '+cat.icon+' '+cat.name:''}</div></div>`+subs.map(subPinnedHTML).join('')+(txs.length?txs.map(txHTML).join(''):'<div class="empty"><div class="empty-sub">No transactions</div></div>');}
+function renderComparePeriodDetail(p){const el=document.getElementById('compd');if(!el)return;const cat=cCatId?getCat(cCatId):null;const ctype=window._cType;let txs,subs=[];if(cCatId){subs=subsForPeriod(p).filter(s=>s.category===cCatId);txs=pTxs(p).filter(t=>t.category===cCatId).sort((a,b)=>b.date.localeCompare(a.date));}else{const type=ctype==='income'?'income':'expense';subs=type==='expense'?subsForPeriod(p):[];txs=pTxs(p).filter(t=>t.type===type).sort((a,b)=>b.date.localeCompare(a.date));}el.innerHTML=`<div class="sh" style="margin-top:16px"><div class="stitle">${periodName(p)}${cat?' · '+cat.name:''}</div></div>`+subs.map(subPinnedHTML).join('')+(txs.length?txs.map(txHTML).join(''):'<div class="empty"><div class="empty-sub">No transactions</div></div>');}
 
 // ═══ RECALCULATE ═══
 async function undoRecalculate(){
