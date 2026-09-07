@@ -680,6 +680,34 @@ async function init(){
     document.getElementById('ls').style.display='flex';
   }
   setupSwipe();
+  setupResumeSync();
+}
+
+// Re-fetch data from remote whenever the app returns to the foreground
+// (PWA on Android often resumes stale JS state instead of reloading the page)
+let resumeSyncing=false;
+let lastResumeSync=0;
+function setupResumeSync(){
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')resumeSync();
+  });
+  window.addEventListener('pageshow',()=>resumeSync());
+  window.addEventListener('focus',()=>resumeSync());
+}
+async function resumeSync(){
+  if(resumeSyncing)return;
+  if(!document.getElementById('ma').classList.contains('visible'))return;
+  const now=Date.now();
+  if(now-lastResumeSync<3000)return;
+  lastResumeSync=now;
+  resumeSyncing=true;
+  try{
+    await loadUserData();
+    await loadFamily();
+    renderAll();
+  }finally{
+    resumeSyncing=false;
+  }
 }
 
 // Load data for currently set userkey into S
@@ -2218,6 +2246,7 @@ function renderAll(){
   const sp=document.getElementById('page-settings');if(sp&&sp.classList.contains('active'))renderSettings();
   const tp=document.getElementById('page-transactions');if(tp&&tp.classList.contains('active')){populateTxPeriodSel();renderAllTx();}
   const rp=document.getElementById('page-reports');if(rp&&rp.classList.contains('active')){populateRPeriodSel();renderReports();}
+  const fp=document.getElementById('page-family');if(fp&&fp.classList.contains('active'))renderFamily();
 }
 
 init().then(()=>{const a=document.querySelector('.ni.active');if(a)spawnNavStars(a);});
