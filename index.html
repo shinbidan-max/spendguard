@@ -596,7 +596,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 
 <script>
 // ═══ CONFIG ═══
-const APP_VERSION='2026.09.08.1'; // bump on every deploy — keep in sync with sw.js CACHE name
+const APP_VERSION='2026.09.08.2'; // bump on every deploy
 const SUPA_URL='https://jxclvwluqmvmtrsdrjvd.supabase.co';
 const SUPA_KEY='sb_publishable_ct0wQhsJg0GENa3uKX6KIg_H3nMD4-R';
 const DEF_CATS=[
@@ -2256,7 +2256,7 @@ init().then(()=>{const a=document.querySelector('.ni.active');if(a)spawnNavStars
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW registration failed',err));
+    navigator.serviceWorker.register('sw.js',{scope:'/spendguard/'}).catch(err=>console.warn('SW registration failed',err));
   });
 }
 </script>
