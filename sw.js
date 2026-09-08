@@ -1,4 +1,4 @@
-const CACHE = 'spendguard-v1';
+const CACHE = 'spendguard-2026.09.08.1'; // keep in sync with APP_VERSION in index.html
 const ASSETS = [
   './',
   './index.html',

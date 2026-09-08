@@ -458,6 +458,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
       <div class="sr" onclick="syncNow()"><span>Sync Now</span><span style="font-size:13px;color:var(--text2);font-family:'Noto Sans Thai',sans-serif" id="lsl">Never</span></div>
       <div class="sr" onclick="askReset()"><span style="color:var(--danger)">Reset All Data</span></div>
     </div>
+    <div style="text-align:center;font-size:11px;color:var(--text3);letter-spacing:.5px;margin-top:8px" id="app-version">v—</div>
   </div>
 
   <div class="bottom-nav">
@@ -595,6 +596,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sa
 
 <script>
 // ═══ CONFIG ═══
+const APP_VERSION='2026.09.08.1'; // bump on every deploy — keep in sync with sw.js CACHE name
 const SUPA_URL='https://jxclvwluqmvmtrsdrjvd.supabase.co';
 const SUPA_KEY='sb_publishable_ct0wQhsJg0GENa3uKX6KIg_H3nMD4-R';
 const DEF_CATS=[
@@ -2249,6 +2251,7 @@ function renderAll(){
   const fp=document.getElementById('page-family');if(fp&&fp.classList.contains('active'))renderFamily();
 }
 
+document.getElementById('app-version').textContent='v'+APP_VERSION;
 init().then(()=>{const a=document.querySelector('.ni.active');if(a)spawnNavStars(a);});
 
 if('serviceWorker' in navigator){
